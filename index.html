@@ -33,12 +33,18 @@ button{cursor:pointer;border:0;background:none}
 .top-in{max-width:1240px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:24px}
 .logo{font-weight:600;font-size:19px;letter-spacing:-.02em}
 .logo span{color:var(--green)}
-/* Pantalla de carga: un punto del que sale "Daily" hacia la izquierda */
-#splash{position:fixed;inset:0;z-index:200;background:#f5f5f7;display:grid;place-items:center;animation:spOut .3s ease 1.05s forwards}
+/* Pantalla de carga: calendario → punto → "Daily." */
+#splash{position:fixed;inset:0;z-index:200;background:#f5f5f7;display:grid;place-items:center;animation:spOut .3s ease 1.35s forwards}
 #splash .spg{display:flex;align-items:baseline;font-size:46px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
-#splash .spw{display:inline-flex;justify-content:flex-end;overflow:hidden;white-space:nowrap;max-width:0;animation:spText .45s cubic-bezier(.22,.61,.36,1) .3s forwards}
-#splash .spd{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:var(--green);margin-left:.05em;transform:scale(0);animation:spDot .75s cubic-bezier(.22,.61,.36,1) forwards}
-@keyframes spDot{0%{transform:scale(0)}30%{transform:scale(2.6)}40%{transform:scale(2.6)}78%{transform:scale(1)}100%{transform:scale(1)}}
+#splash .spw{display:inline-flex;justify-content:flex-end;overflow:hidden;white-space:nowrap;max-width:0;animation:spText .45s cubic-bezier(.22,.61,.36,1) .8s forwards}
+#splash .spd{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#ff3b30;transform:scale(9);animation:spDot .45s cubic-bezier(.4,0,.2,1) .5s forwards}
+#splash .spdw{position:relative;display:inline-block;margin-left:.05em;line-height:0}
+#splash .spcal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:1.2;display:grid;grid-template-columns:repeat(3,88px);grid-auto-rows:88px;place-items:center;font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--text);animation:fadeIn .15s ease both}
+#splash .spcal .o{animation:spOther .3s ease .22s forwards}
+#splash .spcal .c{color:#fff;font-weight:700;animation:spNum .18s ease .45s forwards}
+@keyframes spDot{0%{transform:scale(9);background:#ff3b30}75%{transform:scale(1.3);background:#ff3b30}100%{transform:scale(1);background:var(--green)}}
+@keyframes spOther{to{opacity:0;transform:scale(.7)}}
+@keyframes spNum{to{opacity:0;transform:scale(.6)}}
 @keyframes spText{from{max-width:0}to{max-width:3em}}
 @keyframes spOut{to{opacity:0;visibility:hidden}}
 .seg{display:inline-flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px}
@@ -559,7 +565,14 @@ label.bfield input{flex:1}
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><div class="spg"><span class="spw"><span>Daily</span></span><span class="spd"></span></div></div>
+<div id="splash" aria-hidden="true"><div class="spg"><span class="spw"><span>Daily</span></span><span class="spdw"><span class="spd"></span><span class="spcal" id="spcal"></span></span></div></div>
+<script>
+// Pantalla de carga: calendario con hoy en rojo → el resto desaparece → el círculo se hace el punto de "Daily."
+(function(){
+  const t=new Date(), cal=document.getElementById('spcal'), off=[-8,-7,-6,-1,0,1,6,7,8];
+  cal.innerHTML = off.map(o=>{ const d=new Date(t); d.setDate(t.getDate()+o); return `<span class="${o===0?'c':'o'}">${d.getDate()}</span>`; }).join('');
+})();
+</script>
 
 <header class="top">
   <div class="top-in">
@@ -1370,7 +1383,7 @@ document.addEventListener('touchmove', e=>{ if (e.touches.length>1) e.preventDef
   }, {passive:true});
 })();
 renderHoy();
-setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 1500);
+setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 1750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
