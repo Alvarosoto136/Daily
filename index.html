@@ -517,7 +517,13 @@ label.bfield input{flex:1}
 .ssep{height:1px;background:var(--line);margin:22px 0 18px}
 .modal h3.sh{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:2px}
 @keyframes fade{from{opacity:0}}
-@keyframes pop{from{opacity:0;transform:scale(.96)}}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.965)}}
+@keyframes popOut{to{opacity:0;transform:translateY(8px) scale(.975)}}
+@keyframes fadeOut{to{opacity:0}}
+.modal-bg{animation:fade .24s ease both!important}
+.modal{animation:pop .3s cubic-bezier(.22,.61,.36,1) both!important;will-change:transform,opacity}
+.modal-bg.out{animation:fadeOut .18s ease forwards!important;pointer-events:none}
+.modal-bg.out .modal{animation:popOut .18s ease forwards!important}
 
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:rgba(29,29,31,.92);color:#fff;
   padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;transition:all .3s;z-index:60;pointer-events:none}
@@ -1262,7 +1268,7 @@ function addEntry(){
 /* ---------- Producto propio y ajustes ---------- */
 function openModal(html){ $('#modalRoot').innerHTML = `<div class="modal-bg"><div class="card modal">${html}</div></div>`;
   const f=$('#modalRoot input'); if (f) f.focus(); }
-function closeModal(){ $('#modalRoot').innerHTML=''; }
+function closeModal(){ const bg=$('#modalRoot .modal-bg'); if (!bg || bg.classList.contains('out')){ return; } bg.classList.add('out'); setTimeout(()=>{ if ($('#modalRoot .modal-bg.out')) $('#modalRoot').innerHTML=''; }, 180); }
 function newProductModal(){
   const cats = GROUPS.map(g=>g.id);
   openModal(`<h2>Nuevo producto</h2><p class="s">Copia los valores de la etiqueta (por cada 100 g).</p>
@@ -1555,7 +1561,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125n';
+const BUILD='b20261125o';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
