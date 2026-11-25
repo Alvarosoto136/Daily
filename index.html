@@ -36,7 +36,9 @@ button{cursor:pointer;border:0;background:none}
 .seg{display:inline-flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px}
 .seg button{padding:6px 18px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text);transition:all .2s}
 .seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
-#viewSeg{position:relative}
+html,body{overscroll-behavior-x:none}
+#viewSeg{position:absolute;left:50%;transform:translateX(-50%)}
+.top-in{position:relative}
 #viewSeg button{position:relative;z-index:1}
 #viewSeg button.on{background:transparent;box-shadow:none}
 #viewSeg .pill{position:absolute;top:2px;bottom:2px;left:0;border-radius:8px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04);transition:transform .5s cubic-bezier(.22,.61,.36,1),width .5s cubic-bezier(.22,.61,.36,1)}
@@ -1213,6 +1215,22 @@ document.addEventListener('keydown', e => {
   else if (e.key==='Escape'){ if ($('#modalRoot').innerHTML) closeModal(); else if (ui.sel){ ui.sel=null; renderGrid(); } else if (ui.view==='hoy' && ui.reg){ if (ui.step>1) go(ui.step-1,'back'); else openReg(false); } }
 });
 
+// Deslizar con el dedo entre Diario e Historial
+(()=>{
+  let sx=0, sy=0, st=0, ok=false;
+  document.addEventListener('touchstart', e=>{
+    const t=e.touches[0]; if (e.touches.length!==1) { ok=false; return; }
+    ok = !e.target.closest('input,select,textarea,.modal-bg,.tile.sel,[data-noswipe]') && !$('#modalRoot').innerHTML && !(ui.view==='hoy' && ui.reg);
+    sx=t.clientX; sy=t.clientY; st=Date.now();
+  }, {passive:true});
+  document.addEventListener('touchend', e=>{
+    if (!ok) return; ok=false;
+    const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+    if (Date.now()-st>700 || Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.5) return;
+    if (dx<0 && ui.view==='hoy') setView('hist');
+    else if (dx>0 && ui.view==='hist') setView('hoy');
+  }, {passive:true});
+})();
 renderHoy();
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 movePill(ui.view||'hoy', true);
