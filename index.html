@@ -34,14 +34,14 @@ button{cursor:pointer;border:0;background:none}
 .logo{font-weight:600;font-size:19px;letter-spacing:-.02em}
 .logo span{color:var(--green)}
 /* Pantalla de carga: calendario → punto → "Daily." */
-#splash{position:fixed;inset:0;z-index:200;background:#f5f5f7;display:grid;place-items:center;animation:spOut .3s ease 1.35s forwards}
+#splash{position:fixed;inset:0;z-index:200;background:#f5f5f7;display:grid;place-items:center;animation:spOut .35s ease 2.3s forwards}
 #splash .spg{display:flex;align-items:baseline;font-size:46px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
-#splash .spw{display:inline-flex;justify-content:flex-end;overflow:hidden;white-space:nowrap;max-width:0;animation:spText .45s cubic-bezier(.22,.61,.36,1) .8s forwards}
-#splash .spd{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#ff3b30;transform:scale(9);animation:spDot .45s cubic-bezier(.4,0,.2,1) .5s forwards}
+#splash .spw{display:inline-flex;justify-content:flex-end;overflow:hidden;white-space:nowrap;max-width:0;animation:spText .65s cubic-bezier(.22,.61,.36,1) 1.3s forwards}
+#splash .spd{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#ff3b30;transform:scale(9);animation:spDot .7s cubic-bezier(.4,0,.2,1) .8s forwards}
 #splash .spdw{position:relative;display:inline-block;margin-left:.05em;line-height:0}
 #splash .spcal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:1.2;display:grid;grid-template-columns:repeat(3,88px);grid-auto-rows:88px;place-items:center;font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--text);animation:fadeIn .15s ease both}
-#splash .spcal .o{animation:spOther .3s ease .22s forwards}
-#splash .spcal .c{color:#fff;font-weight:700;animation:spNum .18s ease .45s forwards}
+#splash .spcal .o{animation:spOther .45s ease .4s forwards}
+#splash .spcal .c{color:#fff;font-weight:700;animation:spNum .25s ease .75s forwards}
 @keyframes spDot{0%{transform:scale(9);background:#ff3b30}75%{transform:scale(1.3);background:#ff3b30}100%{transform:scale(1);background:var(--green)}}
 @keyframes spOther{to{opacity:0;transform:scale(.7)}}
 @keyframes spNum{to{opacity:0;transform:scale(.6)}}
@@ -1383,11 +1383,11 @@ document.addEventListener('touchmove', e=>{ if (e.touches.length>1) e.preventDef
   }, {passive:true});
 })();
 renderHoy();
-setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 1750);
+setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125a';
+const BUILD='b20261125b';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
