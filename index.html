@@ -71,6 +71,17 @@ main{max-width:1240px;margin:0 auto;padding:28px 32px 110px}
 .dash .dcol:nth-child(2){grid-column:2;grid-row:1}
 .dash .dcol:nth-child(3){grid-column:2;grid-row:2}
 .dcol{display:flex;flex-direction:column;gap:24px;min-width:0}
+#summary{cursor:pointer;transition:box-shadow .2s}
+#summary:active{box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.05)}
+.sumtog{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:15px;font-weight:600}
+.sumtog .chev{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--bg);transition:transform .35s cubic-bezier(.22,.61,.36,1)}
+#summary.open .sumtog .chev{transform:rotate(180deg)}
+.logwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,.61,.36,1)}
+.logwrap.open{grid-template-rows:1fr}
+.logclip{overflow:hidden;min-height:0}
+.logwrap .log{margin-top:14px;opacity:0;transform:translateY(-8px);transition:opacity .3s,transform .4s cubic-bezier(.22,.61,.36,1)}
+.logwrap.open .log{opacity:1;transform:none}
+.logwrap .logtitle{display:none}
 .reg{max-width:920px;margin:0 auto;position:relative;padding-top:8px}
 .regmode .topbar{display:none}
 .fab{position:fixed;right:max(22px,calc(50vw - 620px + 22px));bottom:calc(26px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;
@@ -539,8 +550,8 @@ label.bfield input{flex:1}
     <!-- RESUMEN -->
     <div class="dash" id="dash">
       <div class="dcol">
-        <div class="card summary" id="summary"></div>
-        <div class="card log" id="log"></div>
+        <div class="sumwrap"><div class="card summary" id="summary"></div>
+        <div class="logwrap" id="logwrap"><div class="logclip"><div class="card log" id="log"></div></div></div></div>
       </div>
       <div class="dcol">
         <div class="card bal" id="bal"></div>
@@ -830,7 +841,7 @@ function logHTML(k, editable){
   }).join('');
 }
 function renderSide(){ if (ui.reg && $('#dash').classList.contains('hidden')) return; animSwap(renderSide0); }
-function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date); $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
+function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date) + `<div class="sumtog"><span>Alimentos del día</span><span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`; $('#logwrap').classList.toggle('open', !!ui.logOpen); $('#summary').classList.toggle('open', !!ui.logOpen); $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
 
 /* ---------- Balance: déficit / superávit ---------- */
 const GYM = [
@@ -1191,6 +1202,7 @@ document.addEventListener('click', e => {
   const mh = t.closest('.mhead'); if (mh && !mh.disabled){ const g = mh.closest('.mg'); ui.open = ui.open||{}; ui.open[g.dataset.mg] = !ui.open[g.dataset.mg]; g.classList.toggle('open'); return; }
   const tb = t.closest('#setTabs [data-tab]'); if (tb) return setTab(+tb.dataset.tab);
   if (t.closest('#regBtn')) return openReg(true);
+  if (t.closest('#summary')){ ui.logOpen=!ui.logOpen; $('#logwrap').classList.toggle('open', ui.logOpen); $('#summary').classList.toggle('open', ui.logOpen); return; }
   if (t.closest('#regBack')) return openReg(false);
   if (t.closest('#updHevy')){
     navigator.clipboard?.writeText('actualiza Hevy').catch(()=>{});
