@@ -592,6 +592,30 @@ html.dark .modal .plist,html.dark .modal .mcell,html.dark .av{background:#2c2c2e
 html.dark .modal .prow{border-bottom-color:#3a3a3c}
 html.dark .prow .chev{color:#636366}
 
+.gsteps .gs{min-height:54px}
+.gs .gn{width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--card);font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.gs .gt{flex:1;font-size:15px;font-weight:600}
+.prow.gs>span.gn:first-child{font-size:12px;font-weight:700}
+.gs.col{flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;cursor:default}
+.gs .gh{display:flex;align-items:center;gap:10px}
+.gs .gh b{font-size:15px;font-weight:600}
+.gs input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:9px;background:var(--line);outline:none;accent-color:var(--c)}
+.gs input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--c);box-shadow:0 1px 4px rgba(0,0,0,.2);cursor:pointer}
+.gs input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--c)}
+.gs .gf{font-size:13px;color:var(--muted);line-height:1.4}
+.gs .gf b{color:var(--text);font-weight:600}
+.gres{margin-top:16px;padding:16px;border-radius:14px;background:var(--bg)}
+.grt{font-size:15px;font-weight:700;margin-bottom:10px}
+.gbar{display:flex;height:10px;border-radius:99px;overflow:hidden;gap:2px;margin-bottom:12px}
+.gbar i{display:block;height:100%;transition:width .3s}
+.gcells{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gcells div{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.gcells .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.gcells b{font-size:20px;color:var(--text);font-weight:700;letter-spacing:-.02em}
+.gwarn{margin-top:12px;font-size:13px;color:#c93400;line-height:1.4}
+html.dark .gres{background:#2c2c2e}
+html.dark .gwarn{color:#ff9f0a}
+html.dark .gs input[type=range]{background:#3a3a3c}
 /* Modo noche */
 html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .55s ease,color .55s ease,border-color .55s ease,box-shadow .55s ease,fill .55s ease,stroke .55s ease,transform .25s cubic-bezier(.4,0,.2,1)!important}
 html.dark{--bg:#000000;--card:#1c1c1e;--text:#f5f5f7;--muted:#98989d;--line:#38383a;--green-soft:#12301b;--shadow:none;color-scheme:dark}
@@ -1234,7 +1258,6 @@ function settingsModal(){
       <div class="subp" data-s="0">
       <div class="plist slist">
         <button type="button" class="prow nav" data-sub="1"><i class="sic" style="background:#34c759">🎯</i><span>Objetivos diarios</span><em></em><b class="chev">›</b></button>
-        <button type="button" class="prow nav" data-sub="2"><i class="sic" style="background:#0a84ff">🧮</i><span>Calculadora de macros</span><em></em><b class="chev">›</b></button>
       </div>
       <div class="plist slist">
         <label class="prow nav"><i class="sic" style="background:#5e5ce6">🌙</i><span>Modo noche</span><em></em><input type="checkbox" class="sw" id="darkSw"></label>
@@ -1242,31 +1265,23 @@ function settingsModal(){
       </div>
       <div class="subp hidden" data-s="1">
       <button type="button" class="sback" data-sub="0">‹ Ajustes</button>
-      <h2>Objetivos diarios</h2><p class="s">Se usan para los anillos, las barras y el calendario.</p>
-      <div class="plist">
-        <label class="prow"><span>Calorías</span><span class="pv"><input name="k" type="number" inputmode="numeric" min="1" value="${G.k}"><em>kcal</em></span></label>
-        <label class="prow"><span><i class="dot" style="background:var(--prot)"></i> Proteína</span><span class="pv"><input name="p" type="number" inputmode="numeric" min="1" value="${G.p}"><em>g</em></span></label>
-        <label class="prow"><span><i class="dot" style="background:var(--carb)"></i> Hidratos</span><span class="pv"><input name="c" type="number" inputmode="numeric" min="1" value="${G.c}"><em>g</em></span></label>
-        <label class="prow"><span><i class="dot" style="background:var(--fat)"></i> Grasa</span><span class="pv"><input name="g" type="number" inputmode="numeric" min="1" value="${G.g}"><em>g</em></span></label>
+      <h2>Objetivos diarios</h2><p class="s" id="goalIntro"></p>
+      <div class="plist gsteps">
+        <label class="prow gs"><span class="gn">1</span><span class="gt">Calorías</span><span class="pv"><input name="k" type="number" inputmode="numeric" min="1" value="${G.k}"><em>kcal</em></span></label>
+        <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--prot)">2</span><span class="gt">Proteína</span><b><output id="pkgOut"></output> g/kg</b></div>
+          <input type="range" name="pkg" min="1.6" max="2" step="0.1" value="${P.pkg??1.8}" style="--c:var(--prot)"><div class="gf" id="pF"></div></div>
+        <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--fat)">3</span><span class="gt">Grasa</span><b><output id="gkgOut"></output> g/kg</b></div>
+          <input type="range" name="gkg" min="0.6" max="1" step="0.05" value="${P.gkg??0.9}" style="--c:var(--fat)"><div class="gf" id="gF"></div></div>
+        <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--carb)">4</span><span class="gt">Carbohidratos</span><b id="cOut"></b></div><div class="gf" id="cF"></div></div>
       </div>
-      </div>
-      <div class="subp hidden" data-s="2">
-      <button type="button" class="sback" data-sub="0">‹ Ajustes</button>
-      <h2>Calculadora de macros</h2><p class="s">Según tu peso (en Mi perfil) y tus calorías objetivo (<b id="calcK"></b>). Los hidratos son el resto de calorías.</p>
-      <div class="calcm">
-        <div class="rng"><div class="rl"><span>Proteína</span><b><output id="pkgOut"></output> g/kg</b></div>
-          <input type="range" name="pkg" min="1.6" max="2" step="0.1" value="${P.pkg??1.8}"></div>
-        <div class="rng"><div class="rl"><span>Grasa</span><b><output id="gkgOut"></output> g/kg</b></div>
-          <input type="range" name="gkg" min="0.8" max="1" step="0.05" value="${P.gkg??0.9}"></div>
-        <div class="mres" id="mres"></div>
-        <button type="button" class="btn green" id="applyMacros" style="width:100%">Usar estos valores como objetivo</button>
-      </div>
+      <div id="gRes"></div>
       </div>
       </div>
       <div class="mfoot"><button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Guardar</button></div>
     </form>`);
   $('#fGoal').onsubmit = ev => { ev.preventDefault(); const f=Object.fromEntries(new FormData(ev.target));
-    db.goal = {k:+f.k||2000, p:+f.p||120, c:+f.c||230, g:+f.g||65};
+    const mc = macroCalc(+f.peso, +f.k, +f.pkg, +f.gkg);
+    db.goal = mc && mc.c>=0 ? {k:+f.k, p:Math.round(mc.p), c:Math.round(mc.c), g:Math.round(mc.g)} : {...db.goal, k:+f.k||db.goal.k};
     db.profile = {nombre:(f.nombre||'').trim(), foto:avFoto||'', peso:f.peso, altura:f.altura, edad:f.edad, sexo:f.sexo||'', pkg:+f.pkg, gkg:+f.gkg, rir:+f.rir};
     save(); closeModal(); renderAll(); toast('Ajustes guardados'); };
   const avDraw = () => { const n=$('#fGoal [name=nombre]').value; $('#avBtn').firstChild && [...$('#avBtn').childNodes].forEach(c=>{ if (c.id!=='avFile') c.remove(); }); $('#avBtn').insertAdjacentHTML('afterbegin', avHTML(avFoto,n));
@@ -1276,25 +1291,31 @@ function settingsModal(){
   $('#fGoal [name=nombre]').addEventListener('input', () => { if (!avFoto) avDraw(); });
   let last=null;
   themeMarks(); $('#darkSw').onchange = e => setTheme(e.target.checked?'dark':'light');
-  const upd = () => { const f=Object.fromEntries(new FormData($('#fGoal'))); const b=bmr(f);
-    $('#calcK').textContent = (+f.k ? fk(+f.k) : '—') + ' kcal';
+  const upd = () => { const f=Object.fromEntries(new FormData($('#fGoal'))); const b=bmr(f), w=+f.peso, K=+f.k;
     $('#tmb').innerHTML = b ? `Metabolismo basal estimado: <b>${fk(b)} kcal/día</b>` : '';
-    $('#pkgOut').textContent = nf1.format(+f.pkg); $('#gkgOut').textContent = new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(+f.gkg);
-    last = macroCalc(+f.peso, +f.k, +f.pkg, +f.gkg);
-    const box=$('#mres'), btn=$('#applyMacros');
-    if (!last){ box.innerHTML = `<div class="mwarn">Introduce tu peso y las calorías objetivo para calcularlo.</div>`; btn.disabled=true; return; }
-    box.innerHTML = `<div class="mcell"><i class="dot" style="background:var(--prot)"></i><span>Proteína</span><b>${fk(last.p)} g</b></div>
-      <div class="mcell"><i class="dot" style="background:var(--fat)"></i><span>Grasa</span><b>${fk(last.g)} g</b></div>
-      <div class="mcell"><i class="dot" style="background:var(--carb)"></i><span>Carbohidratos</span><b>${fk(last.c)} g</b></div>
-      <div class="mcell"><i class="dot" style="background:#af52de"></i><span>Creatina</span><b>${nf1.format(last.cr)} g</b></div>
-      ${last.c<0?'<div class="mwarn">Con estas calorías no quedan hidratos: sube las calorías objetivo.</div>':''}`;
-    btn.disabled = last.c<0; };
-  $('#applyMacros').onclick = () => { if(!last) return; const f=$('#fGoal');
-    f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); upd(); setSub(1); toast('Valores aplicados. Pulsa Guardar.'); };
+    const n2 = new Intl.NumberFormat('es-ES',{maximumFractionDigits:2});
+    $('#pkgOut').textContent = nf1.format(+f.pkg); $('#gkgOut').textContent = n2.format(+f.gkg);
+    $('#goalIntro').innerHTML = w ? `Calculado con tu peso: <b>${n2.format(w)} kg</b>. Primero proteína, luego grasa, y los carbohidratos son lo que queda.` : `Pon tu peso en <b>Mi perfil</b> para calcular tus macros.`;
+    const m = macroCalc(w, K, +f.pkg, +f.gkg);
+    if (!m){ ['#pF','#gF','#cF'].forEach(s=>$(s).textContent=''); $('#cOut').textContent=''; $('#gRes').innerHTML=''; return; }
+    const pk=m.p*4, gk=m.g*9, ck=K-pk-gk;
+    $('#pF').innerHTML = `${n2.format(+f.pkg)} × ${n2.format(w)} kg = <b>${fk(m.p)} g</b> · × 4 kcal = <b>${fk(pk)} kcal</b>`;
+    $('#gF').innerHTML = `${n2.format(+f.gkg)} × ${n2.format(w)} kg = <b>${fk(m.g)} g</b> · × 9 kcal = <b>${fk(gk)} kcal</b>`;
+    $('#cOut').textContent = m.c>0 ? nf1.format(m.c/w)+' g/kg' : '';
+    $('#cF').innerHTML = `${fk(K)} − ${fk(pk)} − ${fk(gk)} = <b>${fk(ck)} kcal</b> · ÷ 4 = <b>${fk(Math.max(m.c,0))} g</b>`;
+    const ckg = m.c/w;
+    const warn = m.c<0 ? 'Con estas calorías no quedan carbohidratos: sube las calorías o baja proteína o grasa.'
+      : ckg<3 ? `Los carbohidratos quedan en ${nf1.format(ckg)} g/kg, por debajo de lo recomendado (3–6 g/kg).`
+      : ckg>6 ? `Los carbohidratos quedan en ${nf1.format(ckg)} g/kg, por encima de lo recomendado (3–6 g/kg).` : '';
+    const tot = Math.max(pk+gk+Math.max(ck,0),1);
+    $('#gRes').innerHTML = `<div class="gres"><div class="grt">Tus macros del día</div>
+      <div class="gbar"><i style="width:${pk/tot*100}%;background:var(--prot)"></i><i style="width:${gk/tot*100}%;background:var(--fat)"></i><i style="width:${Math.max(ck,0)/tot*100}%;background:var(--carb)"></i></div>
+      <div class="gcells"><div><span><i class="dot" style="background:var(--prot)"></i>Proteína</span><b>${fk(m.p)} g</b></div><div><span><i class="dot" style="background:var(--fat)"></i>Grasa</span><b>${fk(m.g)} g</b></div><div><span><i class="dot" style="background:var(--carb)"></i>Carbos</span><b>${fk(Math.max(m.c,0))} g</b></div></div>
+      ${warn?`<div class="gwarn">${warn}</div>`:''}</div>`; };
   $('#fGoal').addEventListener('input', upd); upd();
 }
 
-// Calculadora: proteína y grasa por kilo; hidratos = resto de calorías; creatina 1 g por cada 10 kg
+// Objetivos: proteína y grasa por kilo; hidratos = resto de calorías
 function macroCalc(peso, kcal, pkg, gkg){ if(!peso||!kcal) return null;
   const p=peso*pkg, g=peso*gkg, c=(kcal - p*4 - g*9)/4; return {p, g, c, cr:peso/10}; }
 function setSub(n){
@@ -1482,7 +1503,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125h';
+const BUILD='b20261125i';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
