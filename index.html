@@ -617,6 +617,53 @@ html.dark .prow .chev{color:#636366}
 html.dark .gres{background:#2c2c2e}
 html.dark .gwarn{color:#ff9f0a}
 html.dark .gs input[type=range]{background:#3a3a3c}
+/* Daily IA */
+.aifab{width:48px!important;height:48px!important;bottom:calc(98px + env(safe-area-inset-bottom))!important;right:max(28px,calc(50vw - 620px + 28px));background:linear-gradient(135deg,#5e5ce6,#bf5af2);box-shadow:0 6px 18px rgba(94,92,230,.38),0 2px 6px rgba(0,0,0,.12)}
+.aifab:hover{background:linear-gradient(135deg,#5e5ce6,#bf5af2)}
+@media (max-width:600px){ .aifab{right:23px!important;bottom:calc(90px + env(safe-area-inset-bottom))!important} }
+#ai{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;transform:translateY(100%);transition:transform .42s cubic-bezier(.22,.61,.36,1);touch-action:pan-y}
+#ai.on{transform:none}
+body.aiopen{overflow:hidden}
+.aitop{display:flex;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;border-bottom:1px solid var(--line);background:var(--bg)}
+.aitop .regback{margin:0}
+.aitop b{font-size:17px;font-weight:600;display:flex;align-items:center;gap:6px}
+.aitop b svg{color:#7d5cf0}
+.aimenu{width:44px;height:44px;font-size:20px;font-weight:700;letter-spacing:1px;color:var(--text)}
+.aipop{position:absolute;right:12px;top:calc(56px + env(safe-area-inset-top));background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;z-index:2;min-width:210px}
+.aipop button{display:block;width:100%;text-align:left;padding:13px 16px;font-size:15px;border-bottom:1px solid var(--line)}
+.aipop button:last-child{border-bottom:0}
+#aiBody{flex:1;overflow-y:auto;padding:16px 14px 10px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.aim{max-width:86%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.45;word-wrap:break-word}
+.aim.u{align-self:flex-end;background:#0a84ff;color:#fff;border-bottom-right-radius:6px}
+.aim.a{align-self:flex-start;background:var(--card);border-bottom-left-radius:6px;box-shadow:var(--shadow)}
+.aim.err{color:#c93400}
+.aim p+p,.aim p+ul,.aim p+ol,.aim ul+p,.aim ol+p{margin-top:8px}
+.aim ul,.aim ol{padding-left:20px}
+.aim li+li{margin-top:3px}
+.aidots{display:inline-flex;gap:4px;padding:4px 0}
+.aidots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:aiDot 1.2s infinite ease-in-out}
+.aidots i:nth-child(2){animation-delay:.15s}.aidots i:nth-child(3){animation-delay:.3s}
+@keyframes aiDot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+#aiFoot{display:flex;align-items:flex-end;gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
+#aiIn{flex:1;resize:none;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:10px 14px;font:inherit;font-size:16px;line-height:1.3;outline:none;max-height:120px;color:var(--text)}
+#aiSend{width:40px;height:40px;border-radius:50%;background:#0a84ff;color:#fff;display:grid;place-items:center;flex:none}
+#aiSend:disabled{opacity:.4}
+.aiwel,.aisetup{margin:auto 0;text-align:center;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.aibig{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#5e5ce6,#bf5af2);color:#fff;display:grid;place-items:center;margin-bottom:4px}
+.aiwel h2,.aisetup h2{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.aiwel p,.aisetup p{font-size:15px;color:var(--muted);line-height:1.4;max-width:330px}
+.aisetup p.s{font-size:13px}
+.aisugg{display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px;margin-top:8px}
+.aisugg button{background:var(--card);box-shadow:var(--shadow);border-radius:14px;padding:12px 14px;font-size:14px;text-align:left}
+.aisetup input{width:100%;max-width:360px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;font-size:16px;outline:none;color:var(--text)}
+.aisetup .btn{max-width:360px}
+.ailink{font-size:14px;color:#0a84ff;font-weight:500;text-decoration:none;padding:4px}
+.ailink.red{color:#ff3b30}
+html.dark #ai{background:#000}
+html.dark .aim.a,html.dark .aisugg button{background:#1c1c1e}
+html.dark #aiIn,html.dark .aisetup input{background:#1c1c1e;border-color:#38383a}
+html.dark .aipop{background:#2c2c2e}
+html.dark .aim.err{color:#ff9f0a}
 /* Modo noche */
 html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .55s ease,color .55s ease,border-color .55s ease,box-shadow .55s ease,fill .55s ease,stroke .55s ease,transform .25s cubic-bezier(.4,0,.2,1)!important}
 html.dark{--bg:#000000;--card:#1c1c1e;--text:#f5f5f7;--muted:#98989d;--line:#38383a;--green-soft:#12301b;--shadow:none;color-scheme:dark}
@@ -1147,7 +1194,7 @@ function setAct(field, val){
   const pk = $('#pasosK'); if (pk){ const r = balanceCalc(ui.date); pk.textContent = r.ok ? fk(r.pasos) : '–'; }
 }
 function renderHoy(){ renderHead(); renderPicker(); renderSide(); renderRegBtn(); }
-function renderRegBtn(){ const f=$('#regBtn'); if (f) f.classList.toggle('off', !!ui.reg || !!ui.det || ui.view!=='hoy'); }
+function renderRegBtn(){ const off = !!ui.reg || !!ui.det || ui.view!=='hoy'; const f=$('#regBtn'), a=$('#aiBtn'); if (f) f.classList.toggle('off', off); if (a) a.classList.toggle('off', off); }
 // Ventana de detalle del día: anillo, macros y alimentos
 let detBusy=false;
 function dayTitleTxt(){ const k=ui.date, t=todayKey(); return k===t?'Hoy':fmtDay(k).replace(/^./,c=>c.toUpperCase()); }
@@ -1501,13 +1548,135 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125j';
+const BUILD='b20261125k';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
+const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
+const AI_ICON_S = AI_ICON.replace('width="30" height="30"','width="17" height="17"');
+/* ---------- Daily IA: asistente para dudas de entrenamiento, hábitos y alimentación ---------- */
+const AI = { key: localStorage.getItem('daily.aikey')||'', msgs: (()=>{ try{ return JSON.parse(localStorage.getItem('daily.chat')||'[]'); }catch(_){ return []; } })(), busy:false, setup:false };
+const AI_SUGG = ['¿Qué ceno hoy para llegar a mi proteína?', '¿Cómo voy esta semana?', 'Ideas de snack con mucha proteína', '¿Cómo puedo dormir mejor?'];
+function aiSaveChat(){ try{ localStorage.setItem('daily.chat', JSON.stringify(AI.msgs.slice(-40))); }catch(_){} }
+function aiMd(s){ const L = esc(s).split('\n'); let out='', list='';
+  const inl = x => x.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<i>$2</i>');
+  const close = () => { if (list){ out += `</${list}>`; list=''; } };
+  L.forEach(l => { let m;
+    if ((m = l.match(/^\s*[-•*]\s+(.*)/))){ if (list!=='ul'){ close(); out+='<ul>'; list='ul'; } out += `<li>${inl(m[1])}</li>`; }
+    else if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))){ if (list!=='ol'){ close(); out+='<ol>'; list='ol'; } out += `<li>${inl(m[1])}</li>`; }
+    else if ((m = l.match(/^#{1,4}\s+(.*)/))){ close(); out += `<p><b>${inl(m[1])}</b></p>`; }
+    else if (l.trim()){ close(); out += `<p>${inl(l)}</p>`; } else close(); });
+  close(); return out; }
+function aiContext(){
+  const P=db.profile||{}, G=db.goal, t=todayKey(), f1=v=>Math.round(+v||0);
+  const lines = [];
+  lines.push(`Fecha de hoy: ${fmtDay(t)} (${t}).`);
+  lines.push(`Perfil: ${P.nombre?'nombre '+P.nombre+', ':''}${P.sexo||'sexo sin indicar'}, ${P.edad||'?'} años, ${P.altura||'?'} cm, ${P.peso||'?'} kg. Entrena con intensidad RIR ${P.rir??0}.`);
+  lines.push(`Objetivos diarios: ${G.k} kcal, proteína ${G.p} g, carbohidratos ${G.c} g, grasa ${G.g} g.`);
+  const b = bmr(P); if (b) lines.push(`Metabolismo basal estimado: ${f1(b)} kcal.`);
+  lines.push('Últimos 7 días (de más antiguo a hoy):');
+  for (let i=6;i>=0;i--){ const k=addDays(t,-i), tt=totals(k), sl=sleepMin(sleepOf(k)), a=actOf(k), hv=hevyOf(k), bal=balanceCalc(k);
+    const bits=[tt.k ? `${k}: ${f1(tt.k)} kcal, P ${f1(tt.p)} g, C ${f1(tt.c)} g, G ${f1(tt.g)} g` : `${k}: sin comida registrada`];
+    if (+a.pasos) bits.push(`${a.pasos} pasos`);
+    if (sl!=null) bits.push(`sueño ${fmtHM(sl)}`);
+    if (hv.length) bits.push('entreno: '+hv.map(w=>`${woType(w)}${w.nombre&&norm(w.nombre)!==norm(woType(w))?' «'+w.nombre+'»':''} ${w.min} min (${(w.ejercicios||[]).map(e=>Array.isArray(e)?`${e[0]} ${(e[1]||[]).map(s=>s[0]+'kg×'+s[1]).join(' ')}`:(e.nombre||'')).filter(Boolean).join('; ')})`).join('; '));
+    if (bal.ok && tt.k) bits.push(`balance ${f1(bal.diff)} kcal`);
+    lines.push('- '+bits.join(', ')); }
+  const d=dayData(t), items=[];
+  MEALS.forEach(m => (d[m.id]||[]).forEach(e => items.push(`${m.name}: ${e.prod.n} ${f1(e.grams)} g`)));
+  lines.push(items.length ? 'Comido hoy: '+items.join('; ')+'.' : 'Hoy aún no ha registrado comida.');
+  const foods=[...db.custom, ...BASE].map(p=>`${p.n} (${p.k} kcal, P ${p.p}, C ${p.c}, G ${p.g} por 100 g)`);
+  lines.push('Alimentos que tiene en su app: '+foods.join('; ')+'.');
+  return lines.join('\n');
+}
+function aiSystem(){ return `Eres el asistente de Daily, la app con la que el usuario apunta lo que come, su entreno, sus pasos y su sueño. Le ayudas con dudas de entrenamiento de fuerza, hábitos, descanso, alimentación y macros.
+Responde siempre en español de España, cercano y directo. Sé breve: unas pocas frases o una lista corta, salvo que te pida más detalle. Usa sus datos cuando sirvan para concretar la respuesta (por ejemplo, cuánta proteína le falta hoy), sin repetirlos todos.
+No eres médico ni dietista: ante dolor, lesiones, síntomas, medicación o trastornos de la conducta alimentaria, dile que consulte a un profesional.
+
+Sus datos de Daily:
+${aiContext()}`; }
+let aiSdk=null;
+async function aiClient(){ if (window.__aiClient) return window.__aiClient;
+  if (!aiSdk) aiSdk = await import('./anthropic-sdk.js');   // SDK oficial de Anthropic, empaquetado junto a la app
+  return { sdk: aiSdk, c: new aiSdk.default({ apiKey: AI.key, dangerouslyAllowBrowser: true, ...(window.__aiBase?{baseURL:window.__aiBase}:{}) }) }; }
+function aiRender(scroll){
+  const p=$('#ai'); if (!p) return;
+  const body=$('#aiBody'), foot=$('#aiFoot');
+  if (!AI.key || AI.setup){
+    foot.classList.add('hidden');
+    body.innerHTML = `<div class="aisetup"><div class="aibig">${AI_ICON}</div><h2>Daily IA</h2>
+      <p>Pregúntale dudas sobre entrenamiento, hábitos o alimentación. Responde teniendo en cuenta tus objetivos, lo que comes, tus entrenos y tu sueño.</p>
+      <p class="s">Para usarlo, pega tu clave de API de Anthropic. Se guarda solo en este móvil. Cada pregunta cuesta unos céntimos de tu cuenta de API.</p>
+      <input id="aiKeyIn" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-..." value="">
+      <button class="btn primary" id="aiKeySave" style="width:100%">Guardar clave</button>
+      <a class="ailink" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Conseguir una clave en console.anthropic.com ›</a>
+      ${AI.key?'<button class="ailink red" id="aiKeyDel">Quitar la clave guardada</button><button class="ailink" id="aiKeyBack">Volver al chat</button>':''}</div>`;
+    return; }
+  foot.classList.remove('hidden');
+  if (!AI.msgs.length){
+    body.innerHTML = `<div class="aiwel"><div class="aibig">${AI_ICON}</div><h2>¿En qué te ayudo${(db.profile||{}).nombre?', '+esc(db.profile.nombre.split(' ')[0]):''}?</h2><p>Entrenamiento, hábitos, sueño o alimentación. Conozco tus datos de Daily.</p>
+      <div class="aisugg">${AI_SUGG.map(s=>`<button data-aisugg>${esc(s)}</button>`).join('')}</div></div>`;
+  } else {
+    body.innerHTML = AI.msgs.map((m,i)=> m.role==='user' ? `<div class="aim u">${esc(m.content).replace(/\n/g,'<br>')}</div>`
+      : `<div class="aim a${m.err?' err':''}" ${i===AI.msgs.length-1&&AI.busy?'id="aiLive"':''}>${m.content?aiMd(m.content):'<span class="aidots"><i></i><i></i><i></i></span>'}</div>`).join('');
+  }
+  $('#aiSend').disabled = AI.busy;
+  if (scroll!==false) body.scrollTop = body.scrollHeight;
+}
+function openAI(on){
+  let p=$('#ai');
+  if (on){ if (!p){ document.body.insertAdjacentHTML('beforeend', `<div id="ai" data-noswipe><div class="aitop"><button class="regback" id="aiClose" aria-label="Cerrar"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M14 4l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b>${AI_ICON_S} Daily IA</b><button class="aimenu" id="aiMenu" aria-label="Opciones">···</button></div><div class="aipop hidden" id="aiPop"><button id="aiNew">Nueva conversación</button><button id="aiKey">Clave de API</button></div><div id="aiBody"></div><form id="aiFoot"><textarea id="aiIn" rows="1" placeholder="Escribe tu pregunta…"></textarea><button id="aiSend" aria-label="Enviar"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 15V3M3.5 8.5 9 3l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></form></div>`); p=$('#ai');
+      $('#aiFoot').onsubmit = e => { e.preventDefault(); aiAsk($('#aiIn').value); };
+      $('#aiIn').addEventListener('input', e => { e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'; });
+      $('#aiIn').addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey && window.matchMedia('(hover:hover)').matches){ e.preventDefault(); aiAsk(e.target.value); } }); }
+    AI.setup=false; aiRender(); requestAnimationFrame(()=>p.classList.add('on')); document.body.classList.add('aiopen'); }
+  else if (p){ p.classList.remove('on'); document.body.classList.remove('aiopen'); $('#aiPop')?.classList.add('hidden'); }
+}
+async function aiAsk(q){
+  q=(q||'').trim(); if (!q || AI.busy) return;
+  AI.msgs.push({role:'user', content:q}); const ans={role:'assistant', content:''}; AI.msgs.push(ans); AI.busy=true;
+  $('#aiIn').value=''; $('#aiIn').style.height='auto'; aiRender();
+  const hist = AI.msgs.filter(m=>!m.err && m!==ans && m.content).slice(-20).map(m=>({role:m.role, content:m.content}));
+  while (hist.length && hist[0].role!=='user') hist.shift();
+  try {
+    const {sdk, c} = await aiClient();
+    const stream = c.beta.messages.stream({ model:'claude-opus-5-5', max_tokens:4000,
+      betas:['server-side-fallback-2026-07-01'], fallbacks:'default', output_config:{effort:'low'},
+      system: aiSystem(), messages: hist });
+    for await (const ev of stream){
+      if (ev.type==='content_block_delta' && ev.delta.type==='text_delta'){ ans.content += ev.delta.text; const live=$('#aiLive'); if (live){ live.innerHTML=aiMd(ans.content); const b=$('#aiBody'); if (b.scrollHeight-b.scrollTop-b.clientHeight<140) b.scrollTop=b.scrollHeight; } }
+    }
+    const fin = await stream.finalMessage();
+    if (fin.stop_reason==='refusal' && !ans.content){ ans.content='No puedo responder a eso. Prueba a preguntarlo de otra forma.'; ans.err=true; }
+    else if (!ans.content){ ans.content = fin.content.filter(b=>b.type==='text').map(b=>b.text).join('\n') || 'No he recibido respuesta. Inténtalo otra vez.'; }
+  } catch(err){
+    const S = aiSdk || {};
+    ans.err=true;
+    ans.content = (S.AuthenticationError && err instanceof S.AuthenticationError) ? 'La clave de API no es válida. Cámbiala en ··· › Clave de API.'
+      : (S.PermissionDeniedError && err instanceof S.PermissionDeniedError) ? 'Tu clave no tiene permiso para usar este modelo.'
+      : (S.RateLimitError && err instanceof S.RateLimitError) ? 'Demasiadas preguntas seguidas. Espera un momento y vuelve a probar.'
+      : (S.APIConnectionError && err instanceof S.APIConnectionError) || !navigator.onLine ? 'No hay conexión. Revisa internet y vuelve a probar.'
+      : (S.APIError && err instanceof S.APIError && /credit|billing/i.test(err.message||'')) ? 'Tu cuenta de API no tiene saldo. Añade crédito en console.anthropic.com.'
+      : 'Algo ha fallado: '+(err && err.message ? err.message : err);
+  }
+  AI.busy=false; aiSaveChat(); aiRender();
+}
+document.addEventListener('click', e => { const t=e.target;
+  if (t.closest('#aiBtn')) return openAI(true);
+  if (t.closest('#aiClose')) return openAI(false);
+  if (t.closest('#aiMenu')){ $('#aiPop').classList.toggle('hidden'); return; }
+  if (!t.closest('#aiPop')) $('#aiPop')?.classList.add('hidden');
+  if (t.closest('#aiNew')){ if (AI.busy) return; AI.msgs=[]; aiSaveChat(); $('#aiPop').classList.add('hidden'); return aiRender(); }
+  if (t.closest('#aiKey')){ AI.setup=true; $('#aiPop').classList.add('hidden'); return aiRender(); }
+  if (t.closest('#aiKeyBack')){ AI.setup=false; return aiRender(); }
+  if (t.closest('#aiKeyDel')){ AI.key=''; localStorage.removeItem('daily.aikey'); AI.setup=false; toast('Clave quitada'); return aiRender(); }
+  if (t.closest('#aiKeySave')){ const v=($('#aiKeyIn').value||'').trim(); if (!/^sk-ant-/.test(v)){ toast('La clave empieza por sk-ant-'); return; } AI.key=v; localStorage.setItem('daily.aikey', v); AI.setup=false; toast('Clave guardada'); return aiRender(); }
+  const sg=t.closest('[data-aisugg]'); if (sg) return aiAsk(sg.textContent);
+});
 movePill(ui.view||'hoy', true);
 window.addEventListener('resize', ()=>movePill(ui.view||'hoy', true));
 if (document.fonts) document.fonts.ready.then(()=>movePill(ui.view||'hoy', true));
 </script>
+<button class="fab aifab" id="aiBtn" title="Daily IA" aria-label="Daily IA"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg></button>
 <button class="fab" id="regBtn" title="Registrar alimento" aria-label="Registrar alimento"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 5v16M5 13h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
 </body>
 </html>
