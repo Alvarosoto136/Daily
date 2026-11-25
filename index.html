@@ -593,6 +593,7 @@ html.dark .modal .prow{border-bottom-color:#3a3a3c}
 html.dark .prow .chev{color:#636366}
 
 /* Modo noche */
+html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .55s ease,color .55s ease,border-color .55s ease,box-shadow .55s ease,fill .55s ease,stroke .55s ease,transform .25s cubic-bezier(.4,0,.2,1)!important}
 html.dark{--bg:#000000;--card:#1c1c1e;--text:#f5f5f7;--muted:#98989d;--line:#38383a;--green-soft:#12301b;--shadow:none;color-scheme:dark}
 html.dark .top{background:rgba(0,0,0,.72);border-bottom-color:rgba(255,255,255,.08)}
 html.dark #splash{background:#000}
@@ -1302,7 +1303,7 @@ function setSub(n){
     pn.classList.remove('fwd','back'); if (show){ void pn.offsetWidth; pn.classList.add(n>cur?'fwd':'back'); } });
 }
 function themeMarks(){ const s=$('#darkSw'); if (s) s.checked=document.documentElement.classList.contains('dark'); }
-function setTheme(t){ try{ localStorage.setItem('daily.theme', t); }catch(_){} document.documentElement.classList.toggle('dark', t==='dark');
+function setTheme(t){ const R=document.documentElement; R.classList.add('theme-anim'); clearTimeout(setTheme._t); setTheme._t=setTimeout(()=>R.classList.remove('theme-anim'), 700); try{ localStorage.setItem('daily.theme', t); }catch(_){} document.documentElement.classList.toggle('dark', t==='dark');
   const m=document.querySelector('meta[name=theme-color]'); if (m) m.content = t==='dark' ? '#000000' : '#f5f5f7'; themeMarks(); }
 function setTab(n){
   const cur = +($('#setTabs .on')?.dataset.tab||0); if (cur===n) return;
@@ -1481,7 +1482,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125f';
+const BUILD='b20261125g';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
