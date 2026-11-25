@@ -316,6 +316,8 @@ label.bfield input{flex:1}
 .slrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .slbox{background:var(--bg);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
 .slbox span{font-size:12px;color:var(--muted);font-weight:500}
+.slbox input.bad{color:#ff3b30}
+.slbox input::placeholder{color:#c7c7cc}
 .slbox input{border:0;background:transparent;font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--text);outline:0;padding:0;width:100%;font-family:inherit}
 .slout{margin-top:14px}
 .slres{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
@@ -414,6 +416,15 @@ label.bfield input{flex:1}
 .dc .db{height:4px;border-radius:9px;background:#f0f0f2;margin-top:5px;overflow:hidden}
 .dc .db i{display:block;height:100%;border-radius:9px}
 .legend{display:flex;gap:18px;margin-top:18px;font-size:12px;color:var(--muted)}
+/* Calendario simple: solo números; hoy en rojo, días con registros en gris */
+.days .dc{aspect-ratio:auto;min-height:0;height:52px;padding:0;background:transparent;border:0;display:grid;place-items:center;border-radius:0}
+.days .dc:hover{background:transparent}
+.days .dc .dn{width:38px;height:38px;margin:0;font-size:16px;border-radius:50%;display:grid;place-items:center;transition:background .2s,box-shadow .2s}
+.days .dc:hover .dn{background:#f2f2f4}
+.days .dc.has .dn{background:#e5e5ea;font-weight:600}
+.days .dc.today .dn{background:#ff3b30;color:#fff;font-weight:700}
+.days .dc.sel .dn{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--text)}
+.stats{margin-top:18px}
 .legend span{display:flex;align-items:center;gap:6px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
 .stat{background:var(--bg);border-radius:14px;padding:14px}
@@ -519,8 +530,10 @@ label.bfield input{flex:1}
   .toast{bottom:calc(20px + env(safe-area-inset-bottom))}
   .hist{gap:14px}
   .cal{padding:16px 12px}
-  .calhead{flex-wrap:wrap;margin-bottom:12px}
-  .calhead h2{font-size:22px}
+  .calhead{flex-wrap:nowrap;margin-bottom:12px;gap:6px}
+  .calhead h2{font-size:19px;white-space:nowrap}
+  .calhead .nav-arrows .round{width:34px;height:34px}
+  .calhead .nav-arrows .pillbtn,.calhead .nav-arrows button:not(.round){padding:6px 10px;font-size:13px}
   .wk,.days{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
   .wk div{font-size:10px}
   .dc{aspect-ratio:auto;min-height:54px;padding:5px 4px;border-radius:10px;align-items:center;text-align:center}
@@ -529,6 +542,8 @@ label.bfield input{flex:1}
   .dc .dk small{display:none}
   .dc .dgym{position:absolute;top:2px;right:2px;font-size:9px}
   .dc .db{width:100%}
+  .days .dc{height:44px;min-height:0;padding:0}
+  .days .dc .dn{width:34px;height:34px;font-size:15px}
   .legend{flex-wrap:wrap;gap:8px 14px}
 }
 </style>
@@ -605,11 +620,6 @@ label.bfield input{flex:1}
         </div>
         <div class="wk"><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div></div>
         <div class="days" id="days"></div>
-        <div class="legend">
-          <span><i class="dot" style="background:var(--green)"></i>Dentro del objetivo</span>
-          <span><i class="dot" style="background:var(--fat)"></i>Por encima (+10 %)</span>
-          <span><i class="dot" style="background:#c7c7cc"></i>Por debajo</span>
-        </div>
         <div class="stats" id="stats"></div>
       </div>
       <aside class="side">
@@ -978,8 +988,8 @@ function sleepHTML(k, editable){
   if (!editable){ const mins=sleepMin(sl); return mins==null ? '' : `<h3>Sueño</h3><div class="slline">🌙 ${esc(sl.in)} → ☀️ ${esc(sl.out)}</div>${sleepResHTML(k)}`; }
   return `<h3>Sueño</h3>
     <div class="slrow">
-      <label class="slbox"><span>🌙 Me acosté</span><input type="time" data-sleep="in" value="${esc(sl.in||'')}"></label>
-      <label class="slbox"><span>☀️ Me levanté</span><input type="time" data-sleep="out" value="${esc(sl.out||'')}"></label>
+      <label class="slbox"><span>🌙 Me acosté</span><input type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="23:30" data-sleep="in" value="${esc(sl.in||'')}"></label>
+      <label class="slbox"><span>☀️ Me levanté</span><input type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="07:30" data-sleep="out" value="${esc(sl.out||'')}"></label>
     </div>
     <div class="slout">${sleepResHTML(k)}</div>`;
 }
@@ -1196,13 +1206,10 @@ function renderHist(){
   for (let i=0;i<42;i++){
     const d=new Date(start); d.setDate(start.getDate()+i); const k=keyOf(d);
     if (i>=35 && d.getMonth()!==mo) break;
-    const tt = totals(k), has = tt.k>0, pct = tt.k/db.goal.k;
+    const tt = totals(k), has = tt.k>0;
     if (has && d.getMonth()===mo) logged.push(tt);
-    const col = pct>1.1 ? 'var(--fat)' : pct>=0.9 ? 'var(--green)' : '#c7c7cc';
-    html += `<button class="dc ${d.getMonth()!==mo?'out':''} ${k===t?'today':''} ${k===ui.calSel?'sel':''}" data-day="${k}">
-      <span class="dn">${d.getDate()}</span>${hevyOf(k).length?'<span class="dgym" title="Entreno">🏋️</span>':''}
-      ${has?`<span class="dk">${fk(tt.k)} <small>kcal</small></span><span class="db"><i style="width:${Math.min(pct*100,100)}%;background:${col}"></i></span>`:''}
-    </button>`;
+    const any = has || hevyOf(k).length>0 || sleepMin(sleepOf(k))!=null || +(actOf(k).pasos||0)>0;
+    html += `<button class="dc ${d.getMonth()!==mo?'out':''} ${k===t?'today':''} ${any?'has':''} ${k===ui.calSel?'sel':''}" data-day="${k}"><span class="dn">${d.getDate()}</span></button>`;
   }
   $('#days').innerHTML = html;
   const n=logged.length, avg = k => n ? logged.reduce((s,x)=>s+x[k],0)/n : 0;
@@ -1305,10 +1312,26 @@ document.addEventListener('click', e => {
     if (d.getMonth()!==ui.month.getMonth()) ui.month=new Date(d.getFullYear(),d.getMonth(),1); return renderHist(); }
   if (t.closest('#openDay')){ ui.date=ui.calSel; ui.sel=null; ui.step=1; resetReg(); return setView('hoy'); }
 });
+// Al salir de la casilla: 730 → 07:30
+document.addEventListener('focusout', e => {
+  const inp=e.target; if (!inp.dataset || !inp.dataset.sleep) return;
+  const d=inp.value.replace(/\D/g,'');
+  if (d.length===3 || d.length<=2 && d.length>0){ const p = d.length===3 ? '0'+d : d.padStart(2,'0')+'00';
+    const h=+p.slice(0,2), m=+p.slice(2); if (h<24 && m<60){ inp.value=p.slice(0,2)+':'+p.slice(2); inp.classList.remove('bad'); setSleep(inp.dataset.sleep, inp.value); } }
+});
 document.addEventListener('input', e => {
   if (e.target.id==='q'){ ui.q=e.target.value; ui.sel=null; renderGrid(); }
   if (e.target.dataset.act && e.target.closest('#wo')) setAct(e.target.dataset.act, e.target.value);
-  if (e.target.dataset.sleep) setSleep(e.target.dataset.sleep, e.target.value);
+  if (e.target.dataset.sleep){
+    // Escribe solo números: 2330 → 23:30
+    const inp=e.target, d=inp.value.replace(/\D/g,'').slice(0,4);
+    inp.value = d.length>2 ? d.slice(0,2)+':'+d.slice(2) : d;
+    let v='';
+    if (d.length===4){ const h=+d.slice(0,2), m=+d.slice(2); if (h<24 && m<60) v=inp.value; }
+    inp.classList.toggle('bad', d.length===4 && !v);
+    if (v || !d.length) setSleep(inp.dataset.sleep, v);
+    if (v && inp.dataset.sleep==='in'){ const o=document.querySelector('[data-sleep=out]'); if (o && !o.value) o.focus(); }
+  }
   if (e.target.classList.contains('gin')){
     ui.selGrams = e.target.value; const p = lookup.get(ui.sel), v = calc(p, qtyToGrams(p, +e.target.value||0));
     e.target.closest('.tile').querySelector('.calc').innerHTML = calcLine(v);
