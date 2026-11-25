@@ -1232,7 +1232,7 @@ function settingsModal(){
       <div class="tabp hidden" data-p="1">
       <div class="subp" data-s="0">
       <div class="plist slist">
-        <button type="button" class="prow nav" data-sub="1"><i class="sic" style="background:#34c759">🎯</i><span>Objetivos diarios</span><em id="goalSum"></em><b class="chev">›</b></button>
+        <button type="button" class="prow nav" data-sub="1"><i class="sic" style="background:#34c759">🎯</i><span>Objetivos diarios</span><em></em><b class="chev">›</b></button>
         <button type="button" class="prow nav" data-sub="2"><i class="sic" style="background:#0a84ff">🧮</i><span>Calculadora de macros</span><em></em><b class="chev">›</b></button>
       </div>
       <div class="plist slist">
@@ -1276,7 +1276,7 @@ function settingsModal(){
   let last=null;
   themeMarks(); $('#darkSw').onchange = e => setTheme(e.target.checked?'dark':'light');
   const upd = () => { const f=Object.fromEntries(new FormData($('#fGoal'))); const b=bmr(f);
-    $('#calcK').textContent = $('#goalSum').textContent = (+f.k ? fk(+f.k) : '—') + ' kcal';
+    $('#calcK').textContent = (+f.k ? fk(+f.k) : '—') + ' kcal';
     $('#tmb').innerHTML = b ? `Metabolismo basal estimado: <b>${fk(b)} kcal/día</b>` : '';
     $('#pkgOut').textContent = nf1.format(+f.pkg); $('#gkgOut').textContent = new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(+f.gkg);
     last = macroCalc(+f.peso, +f.k, +f.pkg, +f.gkg);
@@ -1481,7 +1481,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125e';
+const BUILD='b20261125f';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
