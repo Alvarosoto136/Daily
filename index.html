@@ -440,7 +440,11 @@ label.bfield input{flex:1}
 .tmb{font-size:13px;color:var(--muted);margin:-4px 0 6px;min-height:18px}
 .tmb b{color:var(--text)}
 .mfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
-.mlinks{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.mlinks{display:flex;gap:10px;margin-top:12px}
+.mcell b{white-space:nowrap}
+@media (max-width:600px){ .mcell{gap:6px} .mcell span{font-size:12px} }
+.ssep{height:1px;background:var(--line);margin:22px 0 18px}
+.modal h3.sh{font-size:17px;font-weight:700;letter-spacing:-.01em;margin-bottom:2px}
 @keyframes fade{from{opacity:0}}
 @keyframes pop{from{opacity:0;transform:scale(.96)}}
 
@@ -1018,9 +1022,9 @@ function newProductModal(){
 function settingsModal(){
   const G=db.goal, P=db.profile||{};
   openModal(`<form id="fGoal">
-      <div class="seg tabs" id="setTabs"><button type="button" data-tab="0" class="on">Tus datos</button><button type="button" data-tab="1">Calculadora</button><button type="button" data-tab="2">Objetivos</button></div>
+      <div class="seg tabs" id="setTabs"><button type="button" data-tab="0" class="on">Mi perfil</button><button type="button" data-tab="1">Ajustes</button></div>
       <div class="tabp" data-p="0">
-      <h2>Tus datos</h2><p class="s">Peso, edad, sexo y altura.</p>
+      <h2>Mi perfil</h2><p class="s">Peso, edad, sexo, altura y cómo entrenas.</p>
       <div class="row2">
         <div class="field"><label>Peso (kg)</label><input name="peso" type="number" min="1" step="0.1" value="${esc(P.peso??'')}" placeholder="Ej. 75"></div>
         <div class="field"><label>Altura (cm)</label><input name="altura" type="number" min="1" step="1" value="${esc(P.altura??'')}" placeholder="Ej. 178"></div>
@@ -1038,7 +1042,15 @@ function settingsModal(){
       <div class="tmb" id="tmb"></div>
       </div>
       <div class="tabp hidden" data-p="1">
-      <h2>Calculadora de macros</h2><p class="s">Según tu peso y las calorías de la pestaña Objetivos. Los hidratos son el resto de calorías.</p>
+      <h2>Objetivos diarios</h2><p class="s">Se usan para los anillos, las barras y el calendario.</p>
+      <div class="field"><label>Calorías (kcal)</label><input name="k" type="number" min="1" value="${G.k}"></div>
+      <div class="row2" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>Proteína (g)</label><input name="p" type="number" min="1" value="${G.p}"></div>
+        <div class="field"><label>Hidratos (g)</label><input name="c" type="number" min="1" value="${G.c}"></div>
+        <div class="field"><label>Grasa (g)</label><input name="g" type="number" min="1" value="${G.g}"></div>
+      </div>
+      <div class="ssep"></div>
+      <h3 class="sh">Calculadora de macros</h3><p class="s">Según tu peso (en Mi perfil) y las calorías de arriba. Los hidratos son el resto de calorías.</p>
       <div class="calcm">
         <div class="rng"><div class="rl"><span>Proteína</span><b><output id="pkgOut"></output> g/kg</b></div>
           <input type="range" name="pkg" min="1.6" max="2" step="0.1" value="${P.pkg??1.8}"></div>
@@ -1047,19 +1059,12 @@ function settingsModal(){
         <div class="mres" id="mres"></div>
         <button type="button" class="btn green" id="applyMacros" style="width:100%">Usar estos valores como objetivo</button>
       </div>
-      </div>
-      <div class="tabp hidden" data-p="2">
-      <h2>Objetivos diarios</h2><p class="s">Se usan para los anillos, las barras y el calendario.</p>
-      <div class="field"><label>Calorías (kcal)</label><input name="k" type="number" min="1" value="${G.k}"></div>
-      <div class="row2" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="field"><label>Proteína (g)</label><input name="p" type="number" min="1" value="${G.p}"></div>
-        <div class="field"><label>Hidratos (g)</label><input name="c" type="number" min="1" value="${G.c}"></div>
-        <div class="field"><label>Grasa (g)</label><input name="g" type="number" min="1" value="${G.g}"></div>
-      </div>
+      <div class="ssep"></div>
+      <h3 class="sh">Copia de seguridad</h3><p class="s">Guarda tus datos en un archivo o pásalos a otro dispositivo.</p>
+      <div class="mlinks"><button type="button" class="btn" id="exp">Exportar copia</button><button type="button" class="btn" id="imp">Importar copia</button></div>
       </div>
       <div class="mfoot"><button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Guardar</button></div>
-    </form>
-    <div class="mlinks"><button class="btn" id="exp">Exportar copia</button><button class="btn" id="imp">Importar copia</button></div>`);
+    </form>`);
   $('#fGoal').onsubmit = ev => { ev.preventDefault(); const f=Object.fromEntries(new FormData(ev.target));
     db.goal = {k:+f.k||2000, p:+f.p||120, c:+f.c||230, g:+f.g||65};
     db.profile = {peso:f.peso, altura:f.altura, edad:f.edad, sexo:f.sexo||'', pkg:+f.pkg, gkg:+f.gkg, rir:+f.rir};
@@ -1078,10 +1083,10 @@ function settingsModal(){
       ${last.c<0?'<div class="mwarn">Con estas calorías no quedan hidratos: sube las calorías objetivo.</div>':''}`;
     btn.disabled = last.c<0; };
   $('#applyMacros').onclick = () => { if(!last) return; const f=$('#fGoal');
-    f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); setTab(2); toast('Valores aplicados. Pulsa Guardar.'); };
+    f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); f.k.scrollIntoView({behavior:'smooth',block:'center'}); upd(); toast('Valores aplicados. Pulsa Guardar.'); };
   $('#fGoal').addEventListener('input', upd); upd();
   $('#exp').onclick = () => { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,1)],{type:'application/json'}));
-    a.download='nutri-copia-'+todayKey()+'.json'; a.click(); };
+    a.download='daily-copia-'+todayKey()+'.json'; a.click(); };
   $('#imp').onclick = () => { const i=document.createElement('input'); i.type='file'; i.accept='.json,application/json';
     i.onchange = async () => { try{ const d=JSON.parse(await i.files[0].text()); if(!d.days) throw 0; db={...load(),...d}; save(); closeModal(); renderAll(); toast('Copia importada'); }catch(e){ toast('Archivo no válido'); } };
     i.click(); };
