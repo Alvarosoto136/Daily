@@ -572,21 +572,25 @@ label.bfield input{flex:1}
   .legend{flex-wrap:wrap;gap:8px 14px}
 }
 /* Ajustes: subpestañas y apariencia */
-.seg.subtabs{display:flex;width:100%;margin:-6px 0 20px}
-.seg.subtabs button{flex:1;padding:6px 0;font-size:13px}
 .subp.fwd{animation:inR .4s cubic-bezier(.2,.8,.2,1)}
 .subp.back{animation:inL .4s cubic-bezier(.2,.8,.2,1)}
-.themes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.thm{display:flex;flex-direction:column;align-items:center;gap:10px;padding:0;font-size:15px}
-.thm b{font-weight:500;display:flex;align-items:center;gap:6px}
-.thm b::before{content:"";width:18px;height:18px;border-radius:50%;border:1.5px solid #c7c7cc;box-sizing:border-box}
-.thm.on b::before{border:5px solid #0a84ff}
-.thp{width:100%;aspect-ratio:1/1.15;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:7px;border:2px solid var(--line);transition:border-color .2s}
-.thm.on .thp{border-color:#0a84ff}
-.thp i{display:block;border-radius:6px;height:24%}
-.thp i:first-child{height:12%;width:55%;border-radius:4px}
-.thp.lt{background:#f5f5f7}.thp.lt i{background:#fff}.thp.lt i:first-child{background:#1d1d1f}
-.thp.dk{background:#000}.thp.dk i{background:#1c1c1e}.thp.dk i:first-child{background:#f5f5f7}
+.slist{margin-top:0;margin-bottom:16px}
+.prow.nav{width:100%;text-align:left;cursor:pointer;gap:12px;justify-content:flex-start}
+.prow.nav:active{background:rgba(118,118,128,.12)}
+.prow.nav>span{flex:1;font-size:15px;font-weight:500}
+.prow.nav em{font-style:normal;color:var(--muted);font-size:15px}
+.prow .chev{color:#c7c7cc;font-size:22px;font-weight:400;line-height:1;margin-left:2px}
+.sic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:16px;font-style:normal;flex:none}
+.prow .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.sback{color:#0a84ff;font-size:16px;font-weight:500;padding:0;margin:-4px 0 12px}
+.sw{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:99px;background:#e9e9eb;position:relative;cursor:pointer;transition:background .25s;flex:none;margin:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.sw:checked{background:#34c759}
+.sw:checked::after{transform:translateX(20px)}
+html.dark .sw{background:#39393d}
+html.dark .modal .plist,html.dark .modal .mcell,html.dark .av{background:#2c2c2e}
+html.dark .modal .prow{border-bottom-color:#3a3a3c}
+html.dark .prow .chev{color:#636366}
 
 /* Modo noche */
 html.dark{--bg:#000000;--card:#1c1c1e;--text:#f5f5f7;--muted:#98989d;--line:#38383a;--green-soft:#12301b;--shadow:none;color-scheme:dark}
@@ -618,8 +622,6 @@ html.dark .modal-bg{background:rgba(0,0,0,.55)}
 html.dark .toast{background:rgba(58,58,60,.95)}
 html.dark .updnote code{background:#2c2c2e}
 html.dark .av{color:#636366}
-html.dark .thm b::before{border-color:#636366}
-html.dark .thm.on b::before{border-color:#0a84ff}
 </style>
 </head>
 <body>
@@ -1228,17 +1230,27 @@ function settingsModal(){
       <div class="tmb" id="tmb"></div>
       </div>
       <div class="tabp hidden" data-p="1">
-      <div class="seg subtabs" id="subTabs"><button type="button" data-sub="0" class="on">Objetivos</button><button type="button" data-sub="1">Calculadora</button><button type="button" data-sub="2">Apariencia</button></div>
       <div class="subp" data-s="0">
-      <h2>Objetivos diarios</h2><p class="s">Se usan para los anillos, las barras y el calendario.</p>
-      <div class="field"><label>Calorías (kcal)</label><input name="k" type="number" min="1" value="${G.k}"></div>
-      <div class="row2" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="field"><label>Proteína (g)</label><input name="p" type="number" min="1" value="${G.p}"></div>
-        <div class="field"><label>Hidratos (g)</label><input name="c" type="number" min="1" value="${G.c}"></div>
-        <div class="field"><label>Grasa (g)</label><input name="g" type="number" min="1" value="${G.g}"></div>
+      <div class="plist slist">
+        <button type="button" class="prow nav" data-sub="1"><i class="sic" style="background:#34c759">🎯</i><span>Objetivos diarios</span><em id="goalSum"></em><b class="chev">›</b></button>
+        <button type="button" class="prow nav" data-sub="2"><i class="sic" style="background:#0a84ff">🧮</i><span>Calculadora de macros</span><em></em><b class="chev">›</b></button>
+      </div>
+      <div class="plist slist">
+        <label class="prow nav"><i class="sic" style="background:#5e5ce6">🌙</i><span>Modo noche</span><em></em><input type="checkbox" class="sw" id="darkSw"></label>
       </div>
       </div>
       <div class="subp hidden" data-s="1">
+      <button type="button" class="sback" data-sub="0">‹ Ajustes</button>
+      <h2>Objetivos diarios</h2><p class="s">Se usan para los anillos, las barras y el calendario.</p>
+      <div class="plist">
+        <label class="prow"><span>Calorías</span><span class="pv"><input name="k" type="number" inputmode="numeric" min="1" value="${G.k}"><em>kcal</em></span></label>
+        <label class="prow"><span><i class="dot" style="background:var(--prot)"></i> Proteína</span><span class="pv"><input name="p" type="number" inputmode="numeric" min="1" value="${G.p}"><em>g</em></span></label>
+        <label class="prow"><span><i class="dot" style="background:var(--carb)"></i> Hidratos</span><span class="pv"><input name="c" type="number" inputmode="numeric" min="1" value="${G.c}"><em>g</em></span></label>
+        <label class="prow"><span><i class="dot" style="background:var(--fat)"></i> Grasa</span><span class="pv"><input name="g" type="number" inputmode="numeric" min="1" value="${G.g}"><em>g</em></span></label>
+      </div>
+      </div>
+      <div class="subp hidden" data-s="2">
+      <button type="button" class="sback" data-sub="0">‹ Ajustes</button>
       <h2>Calculadora de macros</h2><p class="s">Según tu peso (en Mi perfil) y tus calorías objetivo (<b id="calcK"></b>). Los hidratos son el resto de calorías.</p>
       <div class="calcm">
         <div class="rng"><div class="rl"><span>Proteína</span><b><output id="pkgOut"></output> g/kg</b></div>
@@ -1247,13 +1259,6 @@ function settingsModal(){
           <input type="range" name="gkg" min="0.8" max="1" step="0.05" value="${P.gkg??0.9}"></div>
         <div class="mres" id="mres"></div>
         <button type="button" class="btn green" id="applyMacros" style="width:100%">Usar estos valores como objetivo</button>
-      </div>
-      </div>
-      <div class="subp hidden" data-s="2">
-      <h2>Apariencia</h2><p class="s">Elige cómo se ve la app.</p>
-      <div class="themes">
-        <button type="button" class="thm" data-theme="light"><span class="thp lt"><i></i><i></i><i></i></span><b>Día</b></button>
-        <button type="button" class="thm" data-theme="dark"><span class="thp dk"><i></i><i></i><i></i></span><b>Noche</b></button>
       </div>
       </div>
       </div>
@@ -1269,9 +1274,9 @@ function settingsModal(){
   $('.avact').addEventListener('click', e => { if (e.target.id==='avDel'){ avFoto=''; avDraw(); } });
   $('#fGoal [name=nombre]').addEventListener('input', () => { if (!avFoto) avDraw(); });
   let last=null;
-  themeMarks();
+  themeMarks(); $('#darkSw').onchange = e => setTheme(e.target.checked?'dark':'light');
   const upd = () => { const f=Object.fromEntries(new FormData($('#fGoal'))); const b=bmr(f);
-    $('#calcK').textContent = (+f.k ? fk(+f.k) : '—') + ' kcal';
+    $('#calcK').textContent = $('#goalSum').textContent = (+f.k ? fk(+f.k) : '—') + ' kcal';
     $('#tmb').innerHTML = b ? `Metabolismo basal estimado: <b>${fk(b)} kcal/día</b>` : '';
     $('#pkgOut').textContent = nf1.format(+f.pkg); $('#gkgOut').textContent = new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(+f.gkg);
     last = macroCalc(+f.peso, +f.k, +f.pkg, +f.gkg);
@@ -1284,7 +1289,7 @@ function settingsModal(){
       ${last.c<0?'<div class="mwarn">Con estas calorías no quedan hidratos: sube las calorías objetivo.</div>':''}`;
     btn.disabled = last.c<0; };
   $('#applyMacros').onclick = () => { if(!last) return; const f=$('#fGoal');
-    f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); upd(); setSub(0); toast('Valores aplicados. Pulsa Guardar.'); };
+    f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); upd(); setSub(1); toast('Valores aplicados. Pulsa Guardar.'); };
   $('#fGoal').addEventListener('input', upd); upd();
 }
 
@@ -1292,12 +1297,11 @@ function settingsModal(){
 function macroCalc(peso, kcal, pkg, gkg){ if(!peso||!kcal) return null;
   const p=peso*pkg, g=peso*gkg, c=(kcal - p*4 - g*9)/4; return {p, g, c, cr:peso/10}; }
 function setSub(n){
-  const cur = +($('#subTabs .on')?.dataset.sub||0); if (cur===n) return;
-  document.querySelectorAll('#subTabs [data-sub]').forEach(b=>b.classList.toggle('on', +b.dataset.sub===n));
+  const vis = document.querySelector('.subp:not(.hidden)'); const cur = vis ? +vis.dataset.s : 0; if (cur===n) return;
   document.querySelectorAll('.subp').forEach(pn=>{ const show = +pn.dataset.s===n; pn.classList.toggle('hidden', !show);
     pn.classList.remove('fwd','back'); if (show){ void pn.offsetWidth; pn.classList.add(n>cur?'fwd':'back'); } });
 }
-function themeMarks(){ const t=document.documentElement.classList.contains('dark')?'dark':'light'; document.querySelectorAll('.thm').forEach(b=>b.classList.toggle('on', b.dataset.theme===t)); }
+function themeMarks(){ const s=$('#darkSw'); if (s) s.checked=document.documentElement.classList.contains('dark'); }
 function setTheme(t){ try{ localStorage.setItem('daily.theme', t); }catch(_){} document.documentElement.classList.toggle('dark', t==='dark');
   const m=document.querySelector('meta[name=theme-color]'); if (m) m.content = t==='dark' ? '#000000' : '#f5f5f7'; themeMarks(); }
 function setTab(n){
@@ -1390,8 +1394,7 @@ document.addEventListener('click', e => {
   if (t.closest('#settingsBtn') || t.closest('#goSettings')) return settingsModal();
   const mh = t.closest('.mhead'); if (mh && !mh.disabled){ const g = mh.closest('.mg'); ui.open = ui.open||{}; ui.open[g.dataset.mg] = !ui.open[g.dataset.mg]; g.classList.toggle('open'); return; }
   const tb = t.closest('#setTabs [data-tab]'); if (tb) return setTab(+tb.dataset.tab);
-  const sb = t.closest('#subTabs [data-sub]'); if (sb) return setSub(+sb.dataset.sub);
-  const th = t.closest('.thm[data-theme]'); if (th) return setTheme(th.dataset.theme);
+  const sb = t.closest('.modal [data-sub]'); if (sb) return setSub(+sb.dataset.sub);
   if (t.closest('#regBtn')) return openReg(true);
   if (t.closest('#summary')) return openDet(true);
   if (t.closest('#detBack')) return openDet(false);
@@ -1478,7 +1481,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125d';
+const BUILD='b20261125e';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
