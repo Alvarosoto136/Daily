@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -36,7 +36,9 @@ button{cursor:pointer;border:0;background:none}
 .seg{display:inline-flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px}
 .seg button{padding:6px 18px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text);transition:all .2s}
 .seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
-html,body{overscroll-behavior-x:none}
+html,body{overscroll-behavior:none;overflow-x:hidden;max-width:100%}
+html{touch-action:pan-y}
+body{touch-action:pan-y}
 #viewSeg{position:absolute;left:50%;transform:translateX(-50%)}
 .top-in{position:relative}
 #viewSeg button{position:relative;z-index:1}
@@ -1257,16 +1259,16 @@ function setView(v, instant){
     hide.classList.add('hidden'); show.classList.remove('hidden'); render(); window.scrollTo({top:0}); return;
   }
   viewBusy=true;
-  const fwd = v==='hist', outCls = fwd ? 'leave-l' : 'leave-r';
+  const fwd = v==='hist', outCls = fwd ? 'q-out-l' : 'q-out-r';
   hide.classList.add(outCls);
   setTimeout(()=>{
     hide.classList.remove(outCls); hide.classList.add('hidden');
     render();
     show.classList.remove('hidden','slide-in-r','slide-in-l','q-in-r','q-in-l'); void show.offsetWidth;
-    show.classList.add(fwd ? 'slide-in-r' : 'slide-in-l');
+    show.classList.add(fwd ? 'q-in-r' : 'q-in-l');
     window.scrollTo({top:0});
-    setTimeout(()=>{ viewBusy=false; }, 300);
-  }, 360);
+    setTimeout(()=>{ viewBusy=false; }, 120);
+  }, 150);
 }
 function setDate(k){ ui.date=k; ui.sel=null; renderHoy(); }
 function renderAll(){ ui.view==='hoy' ? renderHoy() : renderHist(); }
@@ -1342,6 +1344,8 @@ document.addEventListener('keydown', e => {
   else if (e.key==='Escape'){ if (ui.det && !$('#modalRoot').innerHTML) return openDet(false); if ($('#modalRoot').innerHTML) closeModal(); else if (ui.sel){ ui.sel=null; renderGrid(); } else if (ui.view==='hoy' && ui.reg){ if (ui.step>1) go(ui.step-1,'back'); else openReg(false); } }
 });
 
+document.addEventListener('gesturestart', e=>e.preventDefault());
+document.addEventListener('touchmove', e=>{ if (e.touches.length>1) e.preventDefault(); }, {passive:false});
 // Deslizar con el dedo entre Diario e Historial
 (()=>{
   let sx=0, sy=0, st=0, ok=false;
