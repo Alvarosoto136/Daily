@@ -427,7 +427,7 @@ label.bfield input{flex:1}
 .days .dc.sel .dn{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--text)}
 .stats{margin-top:18px}
 .legend span{display:flex;align-items:center;gap:6px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}
 .stat{background:var(--bg);border-radius:14px;padding:14px}
 .stat b{display:block;font-size:22px;letter-spacing:-.02em}
 .stat span{font-size:12px;color:var(--muted)}
@@ -1214,10 +1214,8 @@ function renderHist(){
   }
   $('#days').innerHTML = html;
   const n=logged.length, avg = k => n ? logged.reduce((s,x)=>s+x[k],0)/n : 0;
-  const inGoal = logged.filter(x=>x.k>=db.goal.k*0.9 && x.k<=db.goal.k*1.1).length;
   $('#stats').innerHTML = `<div class="stat"><b>${n}</b><span>días registrados</span></div>
-    <div class="stat"><b>${fk(avg('k'))}</b><span>kcal de media</span></div>
-    <div class="stat"><b>${inGoal}</b><span>días en objetivo</span></div>`;
+    <div class="stat"><b>${fk(avg('k'))}</b><span>kcal de media</span></div>`;
   renderDetail();
 }
 function renderDetail(){
