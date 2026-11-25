@@ -493,6 +493,14 @@ label.bfield input{flex:1}
 .mlinks{display:flex;gap:10px;margin-top:12px}
 .mcell b{white-space:nowrap}
 @media (max-width:600px){ .mcell{gap:6px} .mcell span{font-size:12px} }
+.avwrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 4px}
+.av{width:92px;height:92px;border-radius:50%;background:var(--bg);color:#aeaeb2;display:grid;place-items:center;overflow:hidden;cursor:pointer;border:1px solid var(--line)}
+.av img{width:100%;height:100%;object-fit:cover}
+.av b{font-size:38px;font-weight:600;color:var(--text)}
+.avact{display:flex;gap:16px}
+.avlink{background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:500;color:#007aff;cursor:pointer}
+.avlink.red{color:#ff3b30}
+.prow .pv input.pname{width:170px;font-weight:500}
 .plist{background:var(--bg);border-radius:14px;margin-top:16px;overflow:hidden}
 .prow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:6px 14px;border-bottom:1px solid var(--line);cursor:text}
 .prow:last-child{border-bottom:0}
@@ -1145,13 +1153,17 @@ function newProductModal(){
     db.custom.unshift(p); save(); closeModal(); ui.group=p.cat; ui.step=3; ui.q=''; ui.sel=p.id; ui.selGrams=null; ui.focusGrams=true;
     renderPicker(); toast('Producto guardado'); };
 }
+function avHTML(foto, nombre){ if (foto) return `<img src="${foto}" alt="">`; const i=(nombre||'').trim().charAt(0).toUpperCase(); return i ? `<b>${esc(i)}</b>` : `<svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5z"/></svg>`; }
+function avResize(file){ return new Promise((ok,ko)=>{ const r=new FileReader(); r.onerror=ko; r.onload=()=>{ const im=new Image(); im.onerror=ko; im.onload=()=>{ const S=320, s=Math.min(im.width,im.height), cv=document.createElement('canvas'); cv.width=cv.height=S; cv.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,S,S); ok(cv.toDataURL('image/jpeg',.85)); }; im.src=r.result; }; r.readAsDataURL(file); }); }
 function settingsModal(){
-  const G=db.goal, P=db.profile||{};
+  const G=db.goal, P=db.profile||{}; let avFoto=P.foto||'';
   openModal(`<form id="fGoal">
       <div class="seg tabs" id="setTabs"><button type="button" data-tab="0" class="on">Mi perfil</button><button type="button" data-tab="1">Ajustes</button></div>
       <div class="tabp" data-p="0">
-      <h2>Mi perfil</h2><p class="s">Peso, edad, sexo, altura y cómo entrenas.</p>
+      <div class="avwrap"><label class="av" id="avBtn">${avHTML(P.foto, P.nombre)}<input type="file" id="avFile" accept="image/*" hidden></label>
+        <div class="avact"><label for="avFile" class="avlink">${P.foto?'Cambiar foto':'Añadir foto'}</label>${P.foto?'<button type="button" class="avlink red" id="avDel">Quitar</button>':''}</div></div>
       <div class="plist">
+        <label class="prow"><span>Nombre</span><span class="pv"><input name="nombre" type="text" class="pname" maxlength="30" autocomplete="given-name" value="${esc(P.nombre??'')}" placeholder="Tu nombre"></span></label>
         <label class="prow"><span>Peso</span><span class="pv"><input name="peso" type="number" inputmode="decimal" min="1" step="0.1" value="${esc(P.peso??'')}" placeholder="75"><em>kg</em></span></label>
         <label class="prow"><span>Altura</span><span class="pv"><input name="altura" type="number" inputmode="numeric" min="1" step="1" value="${esc(P.altura??'')}" placeholder="178"><em>cm</em></span></label>
         <label class="prow"><span>Edad</span><span class="pv"><input name="edad" type="number" inputmode="numeric" min="1" step="1" value="${esc(P.edad??'')}" placeholder="25"><em>años</em></span></label>
@@ -1188,8 +1200,13 @@ function settingsModal(){
     </form>`);
   $('#fGoal').onsubmit = ev => { ev.preventDefault(); const f=Object.fromEntries(new FormData(ev.target));
     db.goal = {k:+f.k||2000, p:+f.p||120, c:+f.c||230, g:+f.g||65};
-    db.profile = {peso:f.peso, altura:f.altura, edad:f.edad, sexo:f.sexo||'', pkg:+f.pkg, gkg:+f.gkg, rir:+f.rir};
+    db.profile = {nombre:(f.nombre||'').trim(), foto:avFoto||'', peso:f.peso, altura:f.altura, edad:f.edad, sexo:f.sexo||'', pkg:+f.pkg, gkg:+f.gkg, rir:+f.rir};
     save(); closeModal(); renderAll(); toast('Ajustes guardados'); };
+  const avDraw = () => { const n=$('#fGoal [name=nombre]').value; $('#avBtn').firstChild && [...$('#avBtn').childNodes].forEach(c=>{ if (c.id!=='avFile') c.remove(); }); $('#avBtn').insertAdjacentHTML('afterbegin', avHTML(avFoto,n));
+    $('.avact').innerHTML = `<label for="avFile" class="avlink">${avFoto?'Cambiar foto':'Añadir foto'}</label>${avFoto?'<button type="button" class="avlink red" id="avDel">Quitar</button>':''}`; };
+  $('#avFile').onchange = async e => { const f=e.target.files[0]; if (!f) return; try { avFoto = await avResize(f); avDraw(); } catch(_){ toast('No se pudo cargar la foto'); } e.target.value=''; };
+  $('.avact').addEventListener('click', e => { if (e.target.id==='avDel'){ avFoto=''; avDraw(); } });
+  $('#fGoal [name=nombre]').addEventListener('input', () => { if (!avFoto) avDraw(); });
   let last=null;
   const upd = () => { const f=Object.fromEntries(new FormData($('#fGoal'))); const b=bmr(f);
     $('#tmb').innerHTML = b ? `Metabolismo basal estimado: <b>${fk(b)} kcal/día</b>` : '';
@@ -1387,7 +1404,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125b';
+const BUILD='b20261125c';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
