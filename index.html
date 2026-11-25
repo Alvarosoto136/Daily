@@ -603,6 +603,7 @@ html.dark .prow .chev{color:#636366}
 .gs input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--c);box-shadow:0 1px 4px rgba(0,0,0,.2);cursor:pointer}
 .gs input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--c)}
 .gs .gf{font-size:13px;color:var(--muted);line-height:1.4}
+.gs .gk{font-size:15px;font-weight:600}
 .gs .gf b{color:var(--text);font-weight:600}
 .gres{margin-top:16px;padding:16px;border-radius:14px;background:var(--bg)}
 .grt{font-size:15px;font-weight:700;margin-bottom:10px}
@@ -1269,10 +1270,10 @@ function settingsModal(){
       <div class="plist gsteps">
         <label class="prow gs"><span class="gn">1</span><span class="gt">Calorías</span><span class="pv"><input name="k" type="number" inputmode="numeric" min="1" value="${G.k}"><em>kcal</em></span></label>
         <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--prot)">2</span><span class="gt">Proteína</span><b><output id="pkgOut"></output> g/kg</b></div>
-          <input type="range" name="pkg" min="1.6" max="2" step="0.1" value="${P.pkg??1.8}" style="--c:var(--prot)"><div class="gf" id="pF"></div></div>
+          <input type="range" name="pkg" min="1.6" max="2" step="0.1" value="${P.pkg??1.8}" style="--c:var(--prot)"></div>
         <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--fat)">3</span><span class="gt">Grasa</span><b><output id="gkgOut"></output> g/kg</b></div>
-          <input type="range" name="gkg" min="0.6" max="1" step="0.05" value="${P.gkg??0.9}" style="--c:var(--fat)"><div class="gf" id="gF"></div></div>
-        <div class="prow gs col"><div class="gh"><span class="gn" style="background:var(--carb)">4</span><span class="gt">Carbohidratos</span><b id="cOut"></b></div><div class="gf" id="cF"></div></div>
+          <input type="range" name="gkg" min="0.6" max="1" step="0.05" value="${P.gkg??0.9}" style="--c:var(--fat)"></div>
+        <div class="prow gs"><span class="gn" style="background:var(--carb)">4</span><span class="gt">Carbohidratos</span><b id="cOut" class="gk"></b></div>
       </div>
       <div id="gRes"></div>
       </div>
@@ -1295,14 +1296,11 @@ function settingsModal(){
     $('#tmb').innerHTML = b ? `Metabolismo basal estimado: <b>${fk(b)} kcal/día</b>` : '';
     const n2 = new Intl.NumberFormat('es-ES',{maximumFractionDigits:2});
     $('#pkgOut').textContent = nf1.format(+f.pkg); $('#gkgOut').textContent = n2.format(+f.gkg);
-    $('#goalIntro').innerHTML = w ? `Calculado con tu peso: <b>${n2.format(w)} kg</b>. Primero proteína, luego grasa, y los carbohidratos son lo que queda.` : `Pon tu peso en <b>Mi perfil</b> para calcular tus macros.`;
+    $('#goalIntro').innerHTML = w ? `Calculado con tu peso: <b>${n2.format(w)} kg</b>.` : `Pon tu peso en <b>Mi perfil</b> para calcular tus macros.`;
     const m = macroCalc(w, K, +f.pkg, +f.gkg);
-    if (!m){ ['#pF','#gF','#cF'].forEach(s=>$(s).textContent=''); $('#cOut').textContent=''; $('#gRes').innerHTML=''; return; }
+    if (!m){ $('#cOut').textContent=''; $('#gRes').innerHTML=''; return; }
     const pk=m.p*4, gk=m.g*9, ck=K-pk-gk;
-    $('#pF').innerHTML = `${n2.format(+f.pkg)} × ${n2.format(w)} kg = <b>${fk(m.p)} g</b> · × 4 kcal = <b>${fk(pk)} kcal</b>`;
-    $('#gF').innerHTML = `${n2.format(+f.gkg)} × ${n2.format(w)} kg = <b>${fk(m.g)} g</b> · × 9 kcal = <b>${fk(gk)} kcal</b>`;
     $('#cOut').textContent = m.c>0 ? nf1.format(m.c/w)+' g/kg' : '';
-    $('#cF').innerHTML = `${fk(K)} − ${fk(pk)} − ${fk(gk)} = <b>${fk(ck)} kcal</b> · ÷ 4 = <b>${fk(Math.max(m.c,0))} g</b>`;
     const ckg = m.c/w;
     const warn = m.c<0 ? 'Con estas calorías no quedan carbohidratos: sube las calorías o baja proteína o grasa.'
       : ckg<3 ? `Los carbohidratos quedan en ${nf1.format(ckg)} g/kg, por debajo de lo recomendado (3–6 g/kg).`
@@ -1503,7 +1501,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125i';
+const BUILD='b20261125j';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 movePill(ui.view||'hoy', true);
