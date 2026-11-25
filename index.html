@@ -320,6 +320,14 @@ label.bfield input{flex:1}
 .dc{position:relative}
 .dgym{position:absolute;top:8px;right:8px;font-size:12px}
 .macros{margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.ringwrap .macros{flex:1;min-width:0;margin-top:0;gap:12px}
+.ringwrap .mrow .ml span{white-space:nowrap}
+@media (max-width:600px){
+  .ringwrap{gap:14px}
+  .ring{width:112px;height:112px} .ring svg{width:112px;height:112px}
+  .ring .c b{font-size:24px} .ring .c > span{font-size:11px}
+  .ringwrap .mrow .ml{font-size:12px;gap:6px}
+}
 .mrow .ml{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
 .mrow .ml > span:first-child{font-weight:500;display:flex;align-items:center;gap:7px}
 .mrow .ml > span:last-child{color:var(--muted)}
@@ -771,7 +779,7 @@ function renderGrid(){
 }
 function ringSVG(t, goal, size=132, stroke=12, key){
   const r=(size-stroke)/2, C=2*Math.PI*r, pct=Math.min(t/goal,1), over=t>goal*1.1;
-  return `<svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#f0f0f2" stroke-width="${stroke}"/>
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#f0f0f2" stroke-width="${stroke}"/>
     <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${over?'var(--fat)':'var(--green)'}" stroke-width="${stroke}" stroke-linecap="round"
       stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}"${key?` data-a="${key}" style="stroke-dashoffset:${C*(1-pct)}px"`:''}/></svg>`;
 }
@@ -781,12 +789,11 @@ function summaryHTML(k){
     <div class="bar"><i data-a="b${id}" style="width:${Math.min(v/goal*100,100)}%;background:${color}"></i></div></div>`;
   return `<div class="ringwrap">
       <div class="ring">${ringSVG(t.k,G.k,132,12,'ring')}<div class="c"><b>${N('tk',t.k)}</b><span>de ${fk(G.k)} kcal</span></div></div>
-      <div class="rest">${left>=0?'Te quedan':'Te has pasado'}<b>${N('left',Math.abs(left))} kcal</b>${N('pct',t.k/G.k*100)} % del objetivo</div>
-    </div>
-    <div class="macros">
-      ${macro('Proteína','var(--prot)',t.p,G.p,'p')}
-      ${macro('Carbohidratos','var(--carb)',t.c,G.c,'c')}
-      ${macro('Grasa','var(--fat)',t.g,G.g,'g')}
+      <div class="macros">
+        ${macro('Proteína','var(--prot)',t.p,G.p,'p')}
+        ${macro('Carbohidratos','var(--carb)',t.c,G.c,'c')}
+        ${macro('Grasa','var(--fat)',t.g,G.g,'g')}
+      </div>
     </div>
     ${+(db.profile||{}).peso ? `<div class="crea"><i class="dot" style="background:#af52de"></i>Creatina recomendada<b>${nf1.format(+db.profile.peso/10)} g/día</b></div>` : ''}`;
 }
