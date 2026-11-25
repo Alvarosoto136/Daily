@@ -1069,9 +1069,6 @@ function settingsModal(){
         <div class="mres" id="mres"></div>
         <button type="button" class="btn green" id="applyMacros" style="width:100%">Usar estos valores como objetivo</button>
       </div>
-      <div class="ssep"></div>
-      <h3 class="sh">Copia de seguridad</h3><p class="s">Guarda tus datos en un archivo o pásalos a otro dispositivo.</p>
-      <div class="mlinks"><button type="button" class="btn" id="exp">Exportar copia</button><button type="button" class="btn" id="imp">Importar copia</button></div>
       </div>
       <div class="mfoot"><button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Guardar</button></div>
     </form>`);
@@ -1095,11 +1092,6 @@ function settingsModal(){
   $('#applyMacros').onclick = () => { if(!last) return; const f=$('#fGoal');
     f.p.value=Math.round(last.p); f.g.value=Math.round(last.g); f.c.value=Math.round(last.c); f.k.scrollIntoView({behavior:'smooth',block:'center'}); upd(); toast('Valores aplicados. Pulsa Guardar.'); };
   $('#fGoal').addEventListener('input', upd); upd();
-  $('#exp').onclick = () => { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,1)],{type:'application/json'}));
-    a.download='daily-copia-'+todayKey()+'.json'; a.click(); };
-  $('#imp').onclick = () => { const i=document.createElement('input'); i.type='file'; i.accept='.json,application/json';
-    i.onchange = async () => { try{ const d=JSON.parse(await i.files[0].text()); if(!d.days) throw 0; db={...load(),...d}; save(); closeModal(); renderAll(); toast('Copia importada'); }catch(e){ toast('Archivo no válido'); } };
-    i.click(); };
 }
 
 // Calculadora: proteína y grasa por kilo; hidratos = resto de calorías; creatina 1 g por cada 10 kg
