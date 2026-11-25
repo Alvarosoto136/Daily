@@ -311,6 +311,19 @@ label.bfield input{flex:1}
 .bnote{font-size:13px;color:var(--muted);margin-bottom:10px}
 .link{color:var(--blue);font-weight:500}
 .wo{padding:20px 22px}
+.sleep{padding:20px 22px}
+.sleep h3{font-size:17px;font-weight:600;margin-bottom:12px}
+.slrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.slbox{background:var(--bg);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.slbox span{font-size:12px;color:var(--muted);font-weight:500}
+.slbox input{border:0;background:transparent;font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--text);outline:0;padding:0;width:100%;font-family:inherit}
+.slout{margin-top:14px}
+.slres{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.slres b{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.slres span{font-size:13px;color:var(--muted)}
+.slbar i{background:#5e5ce6}
+.slnote{font-size:13px;color:var(--muted)}
+.slline{font-size:14px;color:#424245;margin-bottom:10px}
 .wo h3{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;font-weight:600;margin-bottom:6px}
 .wo h3 small{font-size:11px;font-weight:600;color:#fff;background:#3b82f6;border-radius:6px;padding:2px 6px}
 .wo hr{border:0;border-top:1px solid var(--line);margin:16px 0}
@@ -556,6 +569,7 @@ label.bfield input{flex:1}
       </div>
       <div class="dcol">
         <div class="card wo" id="wo"></div>
+        <div class="card sleep" id="sleep"></div>
       </div>
     </div>
 
@@ -847,7 +861,7 @@ function logHTML(k, editable){
   }).join('');
 }
 function renderSide(){ if (ui.reg && $('#dash').classList.contains('hidden')) return; animSwap(renderSide0); }
-function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date) + `<div class="sumtog"><span>Alimentos del día</span><span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`; if (ui.det){ $('#detSum').innerHTML = summaryHTML(ui.date); $('#detTitle').textContent = dayTitleTxt(); } $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
+function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date) + `<div class="sumtog"><span>Alimentos del día</span><span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`; if (ui.det){ $('#detSum').innerHTML = summaryHTML(ui.date); $('#detTitle').textContent = dayTitleTxt(); } $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#sleep').innerHTML = sleepHTML(ui.date, true); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
 
 /* ---------- Balance: déficit / superávit ---------- */
 const GYM = [
@@ -944,6 +958,35 @@ function workoutHTML(k){
         <div class="wmeta">⏱ ${fmtMin(w.min)} · ${w.ejercicios.length} ejercicios</div></div>
       <div class="wkc"><b>${fk(K.total)}</b><small>kcal</small></div></div>
     <div class="wlist">${w.ejercicios.map(([n,ss])=>`<div class="wrow"><div class="wn2">${esc(n)}</div><div class="ws2">${setsTxt(ss)}</div></div>`).join('')}</div>`; }).join('<hr>');
+}
+// ---------- Sueño ----------
+const SLEEP_GOAL = 8*60;
+function sleepOf(k){ return (db.days[k] && db.days[k].sleep) || {}; }
+function sleepMin(sl){ if (!sl.in || !sl.out) return null;
+  const m = t => { const [h,mi]=t.split(':').map(Number); return h*60+mi; };
+  return ((m(sl.out) - m(sl.in)) % 1440 + 1440) % 1440; }
+const fmtHM = m => `${Math.floor(m/60)} h${m%60?` ${m%60} min`:''}`;
+function sleepResHTML(k){
+  const mins = sleepMin(sleepOf(k));
+  if (mins==null) return `<div class="slnote">Apunta a qué hora te acostaste y te levantaste.</div>`;
+  const pct = Math.min(mins/SLEEP_GOAL*100, 100), msg = mins>=SLEEP_GOAL ? 'Objetivo cumplido' : mins>=SLEEP_GOAL-60 ? 'Casi' : 'Te falta descanso';
+  return `<div class="slres"><b>${fmtHM(mins)}</b><span>de ${fmtHM(SLEEP_GOAL)} · ${msg}</span></div>
+    <div class="bar slbar"><i data-a="sleep" style="width:${pct}%"></i></div>`;
+}
+function sleepHTML(k, editable){
+  const sl = sleepOf(k);
+  if (!editable){ const mins=sleepMin(sl); return mins==null ? '' : `<h3>Sueño</h3><div class="slline">🌙 ${esc(sl.in)} → ☀️ ${esc(sl.out)}</div>${sleepResHTML(k)}`; }
+  return `<h3>Sueño</h3>
+    <div class="slrow">
+      <label class="slbox"><span>🌙 Me acosté</span><input type="time" data-sleep="in" value="${esc(sl.in||'')}"></label>
+      <label class="slbox"><span>☀️ Me levanté</span><input type="time" data-sleep="out" value="${esc(sl.out||'')}"></label>
+    </div>
+    <div class="slout">${sleepResHTML(k)}</div>`;
+}
+function setSleep(field, val){
+  const day = db.days[ui.date] = dayData(ui.date);
+  day.sleep = {...sleepOf(ui.date), [field]: val}; save();
+  animSwap(()=>{ const o=document.querySelector('#sleep .slout'); if (o) o.innerHTML = sleepResHTML(ui.date); });
 }
 function woCardHTML(k){
   const has = hevyOf(k).length;
@@ -1175,6 +1218,7 @@ function renderDetail(){
     <div class="summary">${summaryHTML(k)}</div>
     <div class="bal" style="border-top:1px solid var(--line)">${balanceHTML(k,false)}</div>
     ${hevyOf(k).length?`<div class="wo" style="border-top:1px solid var(--line)">${workoutHTML(k)}</div>`:''}
+    ${sleepMin(sleepOf(k))!=null?`<div class="sleep" style="border-top:1px solid var(--line)">${sleepHTML(k,false)}</div>`:''}
     <div class="log" style="border-top:1px solid var(--line)">${has ? logHTML(k,false) : '<div class="empty" style="padding:22px">No hay nada registrado este día.</div>'}</div>
     <div style="padding:0 22px 22px"><button class="btn primary" style="width:100%" id="openDay">${has?'Editar este día':'Añadir comida a este día'}</button></div>`;
 }
@@ -1264,6 +1308,7 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if (e.target.id==='q'){ ui.q=e.target.value; ui.sel=null; renderGrid(); }
   if (e.target.dataset.act && e.target.closest('#wo')) setAct(e.target.dataset.act, e.target.value);
+  if (e.target.dataset.sleep) setSleep(e.target.dataset.sleep, e.target.value);
   if (e.target.classList.contains('gin')){
     ui.selGrams = e.target.value; const p = lookup.get(ui.sel), v = calc(p, qtyToGrams(p, +e.target.value||0));
     e.target.closest('.tile').querySelector('.calc').innerHTML = calcLine(v);
