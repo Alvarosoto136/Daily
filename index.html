@@ -300,6 +300,12 @@ label.bfield input{flex:1}
 .bline+.bres{margin-top:14px!important}
 .bout>.bres:first-child{margin-top:4px!important}
 .acal{margin:2px 0 10px}
+.bhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bhead h3{margin:0!important}
+.bnum{font-size:26px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.bnum small{font-size:14px;font-weight:500;color:var(--muted)}
+.bnum.def{color:#248a3d}.bnum.sup{color:#c93400}
+html.dark .bnum.def{color:#30d158}html.dark .bnum.sup{color:#ff9f0a}
 .acal:empty{display:none}
 .acal .bline:last-child{border-bottom:0}
 .btiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -1194,9 +1200,9 @@ function balanceCalc(k){
 }
 function balResHTML(k){
   const r = balanceCalc(k);
-  if (!r.ok) return `<div class="bnote">Rellena peso, altura, edad y sexo en <button class="link" id="goSettings">Ajustes</button> para calcular tu gasto.</div>`;
+  if (!r.ok) return `<h3>Balance del día</h3><div class="bnote">Rellena peso, altura, edad y sexo en <button class="link" id="goSettings">Ajustes</button> para calcular tu gasto.</div>`;
   const def = r.diff < 0;
-  return `<div class="bres ${def?'def':'sup'}"><span>${def?'Déficit calórico':'Superávit calórico'}</span><b>${def?'−':'+'}${N('bdif',Math.abs(r.diff))} kcal</b></div>`;
+  return `<div class="bhead"><h3>Balance del día</h3><b class="bnum ${def?'def':'sup'}">${def?'−':'+'}${N('bdif',Math.abs(r.diff))} <small>kcal</small></b></div>`;
 }
 function calLinesHTML(k){
   const r = balanceCalc(k); if (!r.ok) return '';
@@ -1205,7 +1211,7 @@ function calLinesHTML(k){
     <div class="bline"><span class="bi2 out">🔥</span><div class="bl"><b>Calorías gastadas</b><small title="Basal ${fk(r.b)} · pasos ${fk(r.pasos)} · entreno ${fk(r.gym)}">Basal + pasos + entreno</small><div class="bbar"><i class="out" data-a="bout" style="width:${r.gasto/mx*100}%"></i></div></div><div class="bv">${N('bgas',r.gasto)} <small>kcal</small></div></div>`;
 }
 function balanceHTML(k, editable){
-  return `<h3>Balance del día</h3><div class="bout">${balResHTML(k)}</div>`;
+  return `<div class="bout">${balResHTML(k)}</div>`;
 }
 function setAct(field, val){
   const day = db.days[ui.date] = dayData(ui.date);
@@ -1573,7 +1579,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125q';
+const BUILD='b20261125r';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
