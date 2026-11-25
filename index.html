@@ -75,13 +75,12 @@ main{max-width:1240px;margin:0 auto;padding:28px 32px 110px}
 #summary:active{box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.05)}
 .sumtog{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:15px;font-weight:600}
 .sumtog .chev{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--bg);transition:transform .35s cubic-bezier(.22,.61,.36,1)}
-#summary.open .sumtog .chev{transform:rotate(180deg)}
-.logwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,.61,.36,1)}
-.logwrap.open{grid-template-rows:1fr}
-.logclip{overflow:hidden;min-height:0}
-.logwrap .log{margin-top:14px;opacity:0;transform:translateY(-8px);transition:opacity .3s,transform .4s cubic-bezier(.22,.61,.36,1)}
-.logwrap.open .log{opacity:1;transform:none}
-.logwrap .logtitle{display:none}
+.det{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.det .regback{margin:0}
+.dettitle{font-size:24px;font-weight:700;letter-spacing:-.02em;text-align:center;margin-top:-60px;min-height:44px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.det #detSum{cursor:default}
+.detmode .topbar{display:none}
+@media (max-width:600px){ .dettitle{font-size:20px;margin-top:-54px;min-height:38px} }
 .reg{max-width:920px;margin:0 auto;position:relative;padding-top:8px}
 .regmode .topbar{display:none}
 .fab{position:fixed;right:max(22px,calc(50vw - 620px + 22px));bottom:calc(26px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;
@@ -550,8 +549,7 @@ label.bfield input{flex:1}
     <!-- RESUMEN -->
     <div class="dash" id="dash">
       <div class="dcol">
-        <div class="sumwrap"><div class="card summary" id="summary"></div>
-        <div class="logwrap" id="logwrap"><div class="logclip"><div class="card log" id="log"></div></div></div></div>
+        <div class="card summary" id="summary"></div>
       </div>
       <div class="dcol">
         <div class="card bal" id="bal"></div>
@@ -559,6 +557,14 @@ label.bfield input{flex:1}
       <div class="dcol">
         <div class="card wo" id="wo"></div>
       </div>
+    </div>
+
+    <!-- DETALLE DEL DÍA -->
+    <div class="det hidden" id="det">
+      <button class="round regback" id="detBack" title="Volver al resumen"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h2 class="dettitle" id="detTitle"></h2>
+      <div class="card summary" id="detSum"></div>
+      <div class="card log" id="log"></div>
     </div>
 
     <!-- REGISTRAR ALIMENTO -->
@@ -841,7 +847,7 @@ function logHTML(k, editable){
   }).join('');
 }
 function renderSide(){ if (ui.reg && $('#dash').classList.contains('hidden')) return; animSwap(renderSide0); }
-function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date) + `<div class="sumtog"><span>Alimentos del día</span><span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`; $('#logwrap').classList.toggle('open', !!ui.logOpen); $('#summary').classList.toggle('open', !!ui.logOpen); $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
+function renderSide0(){ $('#summary').innerHTML = summaryHTML(ui.date) + `<div class="sumtog"><span>Alimentos del día</span><span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`; if (ui.det){ $('#detSum').innerHTML = summaryHTML(ui.date); $('#detTitle').textContent = dayTitleTxt(); } $('#bal').innerHTML = balanceHTML(ui.date, true); $('#wo').innerHTML = woCardHTML(ui.date); $('#log').innerHTML = `<div class="logtitle">Alimentos del día</div>` + logHTML(ui.date, true); }
 
 /* ---------- Balance: déficit / superávit ---------- */
 const GYM = [
@@ -978,7 +984,27 @@ function setAct(field, val){
   const pk = $('#pasosK'); if (pk){ const r = balanceCalc(ui.date); pk.textContent = r.ok ? fk(r.pasos) : '–'; }
 }
 function renderHoy(){ renderHead(); renderPicker(); renderSide(); renderRegBtn(); }
-function renderRegBtn(){ const f=$('#regBtn'); if (f) f.classList.toggle('off', !!ui.reg || ui.view!=='hoy'); }
+function renderRegBtn(){ const f=$('#regBtn'); if (f) f.classList.toggle('off', !!ui.reg || !!ui.det || ui.view!=='hoy'); }
+// Ventana de detalle del día: anillo, macros y alimentos
+let detBusy=false;
+function dayTitleTxt(){ const k=ui.date, t=todayKey(); return k===t?'Hoy':fmtDay(k).replace(/^./,c=>c.toUpperCase()); }
+function openDet(on){
+  if (detBusy || !!ui.det===on || ui.reg) return; detBusy=true;
+  const show = on ? $('#det') : $('#dash'), hide = on ? $('#dash') : $('#det'), tb = $('#viewHoy .topbar');
+  const outCls = on ? 'q-out-l' : 'q-out-r';
+  hide.classList.add(outCls); if (on) tb.classList.add(outCls);
+  ui.det = on; renderRegBtn();
+  setTimeout(()=>{
+    hide.classList.remove(outCls); tb.classList.remove(outCls);
+    $('#viewHoy').classList.toggle('detmode', on);
+    hide.classList.add('hidden'); show.classList.remove('hidden','q-in-r','q-in-l','slide-in-r','slide-in-l');
+    if (on){ $('#detSum').innerHTML = summaryHTML(ui.date); $('#detTitle').textContent = dayTitleTxt(); }
+    void show.offsetWidth; show.classList.add(on ? 'q-in-r' : 'q-in-l');
+    if (!on) tb.classList.add('q-fade');
+    window.scrollTo({top:0});
+    setTimeout(()=>{ detBusy=false; tb.classList.remove('q-fade'); }, 400);
+  }, 160);
+}
 let regBusy=false;
 function openReg(on){
   if (regBusy || ui.reg===on) return; regBusy=true;
@@ -1163,6 +1189,7 @@ function movePill(v, instant){
   if (instant){ void pill.offsetWidth; pill.style.transition=''; }
 }
 function resetReg(){
+  if (ui.det){ ui.det=false; $('#viewHoy').classList.remove('detmode'); $('#det').classList.add('hidden'); $('#dash').classList.remove('hidden','q-in-r','q-in-l'); renderRegBtn(); }
   if (!ui.reg) return;
   ui.reg=false; ui.sel=null; ui.step=1;
   $('#viewHoy').classList.remove('regmode'); $('#reg').classList.add('hidden'); $('#dash').classList.remove('hidden','slide-in-r','slide-in-l','q-in-r','q-in-l');
@@ -1202,7 +1229,8 @@ document.addEventListener('click', e => {
   const mh = t.closest('.mhead'); if (mh && !mh.disabled){ const g = mh.closest('.mg'); ui.open = ui.open||{}; ui.open[g.dataset.mg] = !ui.open[g.dataset.mg]; g.classList.toggle('open'); return; }
   const tb = t.closest('#setTabs [data-tab]'); if (tb) return setTab(+tb.dataset.tab);
   if (t.closest('#regBtn')) return openReg(true);
-  if (t.closest('#summary')){ ui.logOpen=!ui.logOpen; $('#logwrap').classList.toggle('open', ui.logOpen); $('#summary').classList.toggle('open', ui.logOpen); return; }
+  if (t.closest('#summary')) return openDet(true);
+  if (t.closest('#detBack')) return openDet(false);
   if (t.closest('#regBack')) return openReg(false);
   if (t.closest('#updHevy')){
     navigator.clipboard?.writeText('actualiza Hevy').catch(()=>{});
@@ -1243,7 +1271,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key==='Enter' && e.target.classList.contains('gin')){ e.preventDefault(); addEntry(); }
-  else if (e.key==='Escape'){ if ($('#modalRoot').innerHTML) closeModal(); else if (ui.sel){ ui.sel=null; renderGrid(); } else if (ui.view==='hoy' && ui.reg){ if (ui.step>1) go(ui.step-1,'back'); else openReg(false); } }
+  else if (e.key==='Escape'){ if (ui.det && !$('#modalRoot').innerHTML) return openDet(false); if ($('#modalRoot').innerHTML) closeModal(); else if (ui.sel){ ui.sel=null; renderGrid(); } else if (ui.view==='hoy' && ui.reg){ if (ui.step>1) go(ui.step-1,'back'); else openReg(false); } }
 });
 
 // Deslizar con el dedo entre Diario e Historial
@@ -1251,7 +1279,7 @@ document.addEventListener('keydown', e => {
   let sx=0, sy=0, st=0, ok=false;
   document.addEventListener('touchstart', e=>{
     const t=e.touches[0]; if (e.touches.length!==1) { ok=false; return; }
-    ok = !e.target.closest('input,select,textarea,.modal-bg,.tile.sel,[data-noswipe]') && !$('#modalRoot').innerHTML && !(ui.view==='hoy' && ui.reg);
+    ok = !e.target.closest('input,select,textarea,.modal-bg,.tile.sel,[data-noswipe]') && !$('#modalRoot').innerHTML && !(ui.view==='hoy' && (ui.reg || ui.det));
     sx=t.clientX; sy=t.clientY; st=Date.now();
   }, {passive:true});
   document.addEventListener('touchend', e=>{
