@@ -36,7 +36,8 @@ button{cursor:pointer;border:0;background:none}
 .seg{display:inline-flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px}
 .seg button{padding:6px 18px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text);transition:all .2s}
 .seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
-html,body{overscroll-behavior:none;overflow-x:hidden;max-width:100%}
+html,body{overscroll-behavior:none}
+body{overflow-x:clip}
 html,body,*{touch-action:pan-y}
 #viewSeg{position:absolute;left:50%;transform:translateX(-50%)}
 .top-in{position:relative}
