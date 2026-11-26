@@ -719,6 +719,10 @@ html.dark .av{color:#636366}
 .swi{position:relative;overflow:hidden}
 .swi .swbg{position:absolute;inset:0;display:flex;align-items:center;color:#fff}
 .swi:not(.on) .swbg{visibility:hidden}
+.swi .swbg{inset:2px 10px;border-radius:14px}
+.swi .item{transition:border-radius .15s,box-shadow .15s}
+.swi.on .item{border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+html.dark .swi.on .item{box-shadow:0 2px 12px rgba(0,0,0,.6)}
 .swi .swbg>span{display:none;align-items:center;height:100%}
 .swi.del .swbg{background:#ff3b30;justify-content:flex-start}.swi.del .sd{display:flex;padding:0 26px;transition:transform .15s}.swi.del.go .sd{transform:scale(1.2)}
 .swi.ed .swbg{background:#0a84ff;justify-content:flex-end}.swi.ed .se{display:flex;gap:10px;padding:0 14px 0 16px}
@@ -729,7 +733,7 @@ html.dark .av{color:#636366}
 html.dark .swi .se .addbtn,html.dark .swi .se .addbtn:hover{background:#3a3a3c;color:#f5f5f7}
 .mbody .swi .item{margin-bottom:0}.mbody .swi:last-child{margin-bottom:8px}
 .swi .item{position:relative;background:var(--card);touch-action:pan-y}
-.swi .item.anim{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.swi .item.anim{transition:transform .22s cubic-bezier(.2,.8,.2,1),border-radius .15s,box-shadow .15s}
 .swi.gone{transition:height .18s cubic-bezier(.4,0,.2,1),opacity .14s;opacity:0}
 .swi .item.out{transition:transform .2s cubic-bezier(.4,0,1,1),opacity .2s;opacity:.4}
 .qedit{display:flex;align-items:center;gap:10px;margin:14px 0 6px}.qedit input{flex:1;font-size:22px;font-weight:600;text-align:center}.qedit span{color:var(--muted);font-size:15px}
@@ -1639,7 +1643,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261126j';
+const BUILD='b20261126k';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
