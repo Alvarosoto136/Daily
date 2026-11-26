@@ -737,6 +737,21 @@ html.dark .swi .se .addbtn,html.dark .swi .se .addbtn:hover{background:#3a3a3c;c
 .swi.gone{transition:height .18s cubic-bezier(.4,0,.2,1),opacity .14s;opacity:0}
 .swi .item.out{transition:transform .2s cubic-bezier(.4,0,1,1),opacity .2s;opacity:.4}
 .qedit{display:flex;align-items:center;gap:10px;margin:14px 0 6px}.qedit input{flex:1;font-size:22px;font-weight:600;text-align:center}.qedit span{color:var(--muted);font-size:15px}
+.scanrow{display:flex;gap:8px;margin:10px 0 14px}.scanbtn svg{flex:none}.scanbtn span{overflow:hidden;text-overflow:ellipsis}
+.scanbtn{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:0;white-space:nowrap;padding:12px 8px;margin:0;border-radius:12px;background:var(--green-soft);color:#248a3d;font-weight:600;font-size:15px;cursor:pointer;transition:opacity .2s}
+.scanbtn.busy{opacity:.6;pointer-events:none}.scanbtn.busy svg{animation:scanp 1s ease-in-out infinite}
+@keyframes scanp{50%{transform:scale(.85)}}
+.scanbtn.alt{background:var(--bg);color:var(--text)}
+.scanbtn.pulse{animation:scpu .8s ease-in-out 3}@keyframes scpu{50%{box-shadow:0 0 0 4px rgba(52,199,89,.35)}}
+.bcbox{margin:-4px 0 14px}.bcbox[hidden]{display:none}
+.bcv{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:16/10}
+.bcv video{width:100%;height:100%;object-fit:cover;display:block}
+.bcline{position:absolute;left:12%;right:12%;top:50%;height:2px;background:#ff3b30;box-shadow:0 0 8px #ff3b30;animation:bcl 1.6s ease-in-out infinite alternate}
+@keyframes bcl{from{top:30%}to{top:70%}}
+.bcbox.noc .bcv{display:none}
+.bcman{display:flex;gap:8px;margin-top:8px}.bcman input{flex:1;min-width:0;border:1px solid #d2d2d7;border-radius:10px;padding:10px 12px;font-size:15px;outline:none;background:#fff;-webkit-user-select:text;user-select:text}
+html.dark .bcman input{background:#2c2c2e;border-color:#38383a;color:var(--text)}
+.field input.filled{border-color:var(--green);box-shadow:0 0 0 3px rgba(52,199,89,.18);transition:box-shadow .3s,border-color .3s}
 </style>
 </head>
 <body>
@@ -1321,10 +1336,16 @@ function addEntry(){
 /* ---------- Producto propio y ajustes ---------- */
 function openModal(html){ $('#modalRoot').innerHTML = `<div class="modal-bg"><div class="card modal">${html}</div></div>`;
   const f=$('#modalRoot input'); if (f) f.focus(); }
-function closeModal(){ const bg=$('#modalRoot .modal-bg'); if (!bg || bg.classList.contains('out')){ return; } bg.classList.add('out'); setTimeout(()=>{ if ($('#modalRoot .modal-bg.out')) $('#modalRoot').innerHTML=''; }, 180); }
+function closeModal(){ bcStop(); const bg=$('#modalRoot .modal-bg'); if (!bg || bg.classList.contains('out')){ return; } bg.classList.add('out'); setTimeout(()=>{ if ($('#modalRoot .modal-bg.out')) $('#modalRoot').innerHTML=''; }, 180); }
 function newProductModal(){
   const cats = GROUPS.map(g=>g.id);
-  openModal(`<h2>Nuevo producto</h2><p class="s">Copia los valores de la etiqueta (por cada 100 g).</p>
+  openModal(`<h2>Nuevo producto</h2><p class="s">Escanea el código de barras y se rellena solo. Si el producto no aparece, haz una foto a la tabla nutricional.</p>
+    <div class="scanrow"><button type="button" class="scanbtn" id="bcBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M8 8v8M11 8v8M14 8v8M17 8v8"/></svg><span id="bcTxt">Código de barras</span></button>
+    <label class="scanbtn alt" id="scanLbl"><input type="file" accept="image/*" capture="environment" id="scanIn" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <span id="scanTxt">Foto a la tabla</span></label></div>
+    <div id="bcBox" class="bcbox" hidden><div class="bcv"><video id="bcVid" playsinline muted></video><i class="bcline"></i></div>
+      <div class="bcman"><input id="bcCode" inputmode="numeric" placeholder="o escribe el código" autocomplete="off"><button type="button" class="btn" id="bcGo">Buscar</button></div></div>
     <form id="fNew">
       <div class="row2"><div class="field"><label>Nombre</label><input name="n" required placeholder="Ej. Yogur de coco"></div>
       <div class="field"><label>Marca (opcional)</label><input name="marca"></div></div>
@@ -1343,7 +1364,76 @@ function newProductModal(){
     const p = {id:'c'+Date.now(), n:f.n.trim(), e:f.e||'🍽️', cat:f.cat, k:+f.k, p:+f.p, c:+f.c, g:+f.g}; if (f.marca.trim()) p.marca=f.marca.trim(); if (+f.u>0) p.u=+f.u;
     db.custom.unshift(p); save(); closeModal(); ui.group=p.cat; ui.step=3; ui.q=''; ui.sel=p.id; ui.selGrams=null; ui.focusGrams=true;
     renderPicker(); toast('Producto guardado'); };
+  $('#bcBtn').onclick = ()=> { if (!$('#bcBox').hidden){ bcStop(); $('#bcBox').hidden=true; return; } bcStart(); };
+  $('#bcGo').onclick = ()=> { const v=($('#bcCode').value||'').replace(/\D/g,''); if (v.length<8){ toast('El código tiene 8 o 13 números'); return; } bcLookup(v); };
+  $('#bcCode').onkeydown = e=>{ if (e.key==='Enter'){ e.preventDefault(); $('#bcGo').click(); } };
+  $('#scanIn').onchange = async ev => { const file=ev.target.files[0]; ev.target.value=''; if (!file) return;
+    if (!AI.key){ toast('Primero añade tu clave de API en el botón de IA'); return; }
+    const lbl=$('#scanLbl'), txt=$('#scanTxt'); lbl.classList.add('busy'); txt.textContent='Leyendo la etiqueta…';
+    try {
+      const data = await imgToB64(file, 1600);
+      const {c} = await aiClient();
+      const r = await c.beta.messages.create({ model:'claude-opus-5-5', max_tokens:600,
+        betas:['server-side-fallback-2026-07-01'], fallbacks:'default', output_config:{effort:'low'},
+        messages:[{role:'user', content:[{type:'image', source:{type:'base64', media_type:'image/jpeg', data}},
+          {type:'text', text:`Esta es la foto de la tabla de información nutricional de un alimento. Lee los valores POR 100 g (o 100 ml). Si solo hay valores por ración, conviértelos a 100 g usando el peso de la ración. No inventes: si un valor no se lee bien, pon null.
+Responde SOLO con un JSON así: {"k":kcal,"p":proteinas_g,"c":hidratos_g,"g":grasas_g,"marca":"marca si se ve o null","u":gramos_por_unidad_si_la_etiqueta_indica_unidad_o_null,"cat":"una de: ${GROUPS.map(g=>g.id).join(', ')}","e":"un emoji que represente el alimento","dudas":"texto corto si algún dato no se lee bien, o null"}`}]}] });
+      const t = r.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const m = t.match(/\{[\s\S]*\}/); if (!m) throw new Error('sin datos');
+      const d = JSON.parse(m[0]), f=$('#fNew'); if (!f) return;
+      const set=(n,v)=>{ if (v!=null && v!=='' && f[n]) { f[n].value=v; f[n].classList.add('filled'); setTimeout(()=>f[n].classList.remove('filled'),900); } };
+      ['k','p','c','g'].forEach(n=>set(n, d[n]!=null ? Math.round(+d[n]*10)/10 : null));
+      if (d.marca && !f.marca.value) set('marca', d.marca); if (+d.u>0) set('u', +d.u);
+      if (d.e) set('e', d.e); if (d.cat && GROUPS.some(g=>g.id===d.cat)) f.cat.value=d.cat;
+      const miss=['k','p','c','g'].filter(n=>d[n]==null);
+      txt.textContent = miss.length ? 'Revisa los campos vacíos' : 'Tabla leída ✓';
+      if (d.dudas || miss.length) toast(d.dudas || 'No se ha leído algún dato, revísalo');
+      f.n.focus();
+    } catch(err){ txt.textContent='Escanear tabla nutricional';
+      const S=aiSdk||{}; toast((S.AuthenticationError && err instanceof S.AuthenticationError) ? 'La clave de API no es válida' : 'No he podido leer la etiqueta. Prueba otra foto'); }
+    finally { lbl.classList.remove('busy'); }
+  };
 }
+// Código de barras: cámara + BarcodeDetector, y búsqueda en Open Food Facts
+let bcStream=null, bcTimer=null;
+function bcStop(){ clearTimeout(bcTimer); bcTimer=null; if (bcStream){ bcStream.getTracks().forEach(t=>t.stop()); bcStream=null; } }
+async function bcStart(){
+  const box=$('#bcBox'), v=$('#bcVid'); box.hidden=false; $('#bcTxt').textContent='Apunta al código';
+  if (!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia){ box.classList.add('noc'); $('#bcTxt').textContent='Código de barras'; $('#bcCode').focus(); toast('Este navegador no lee códigos con la cámara: escríbelo'); return; }
+  try {
+    bcStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1280}}, audio:false});
+    if (!$('#bcVid')){ bcStop(); return; }
+    v.srcObject=bcStream; await v.play();
+    const det = new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});
+    const tick = async ()=>{ if (!bcStream) return;
+      try { const r = await det.detect(v); if (r.length){ const code=r[0].rawValue; if (navigator.vibrate) navigator.vibrate(40); bcStop(); $('#bcCode').value=code; return bcLookup(code); } } catch(_){}
+      bcTimer=setTimeout(tick, 200); };
+    tick();
+  } catch(err){ box.classList.add('noc'); $('#bcTxt').textContent='Código de barras'; toast('No se ha podido abrir la cámara: escribe el código'); $('#bcCode').focus(); }
+}
+async function bcLookup(code){
+  const f=$('#fNew'); if (!f) return; $('#bcTxt').textContent='Buscando…'; $('#bcBtn').classList.add('busy');
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_es,brands,nutriments`);
+    const j = r.ok ? await r.json() : null, pr = j && j.status===1 && j.product;
+    const n = pr && pr.nutriments || {};
+    const kc = n['energy-kcal_100g']!=null ? +n['energy-kcal_100g'] : (n.energy_100g!=null ? +n.energy_100g/4.184 : null);
+    const vals = {k:kc, p:n.proteins_100g, c:n.carbohydrates_100g, g:n.fat_100g};
+    if (!pr || Object.values(vals).every(x=>x==null)){ $('#bcBox').hidden=true; $('#bcTxt').textContent='Código de barras';
+      $('#scanLbl').classList.add('pulse'); setTimeout(()=>$('#scanLbl')?.classList.remove('pulse'),2400);
+      toast('Producto no encontrado: haz una foto a la tabla'); return; }
+    const set=(k,v)=>{ if (v!=null && v!=='' && f[k]){ f[k].value=v; f[k].classList.add('filled'); setTimeout(()=>f[k]?.classList.remove('filled'),900); } };
+    ['k','p','c','g'].forEach(k=>set(k, vals[k]!=null ? Math.round(+vals[k]*10)/10 : null));
+    const nm=(pr.product_name_es||pr.product_name||'').trim(); if (nm && !f.n.value) set('n', nm);
+    const br=(pr.brands||'').split(',')[0].trim(); if (br && !f.marca.value) set('marca', br);
+    $('#bcBox').hidden=true; const miss=['k','p','c','g'].filter(k=>vals[k]==null);
+    $('#bcTxt').textContent = miss.length ? 'Faltan datos' : 'Encontrado ✓';
+    if (miss.length) toast('Faltan datos de la etiqueta: rellénalos o haz foto a la tabla');
+    f.n.focus(); f.n.select();
+  } catch(_){ $('#bcTxt').textContent='Código de barras'; toast('Sin conexión con la base de datos. Prueba la foto a la tabla'); }
+  finally { $('#bcBtn')?.classList.remove('busy'); }
+}
+function imgToB64(file, max){ return new Promise((ok,ko)=>{ const r=new FileReader(); r.onerror=ko; r.onload=()=>{ const im=new Image(); im.onerror=ko; im.onload=()=>{ const k=Math.min(1, max/Math.max(im.width,im.height)), cv=document.createElement('canvas'); cv.width=Math.round(im.width*k); cv.height=Math.round(im.height*k); cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height); ok(cv.toDataURL('image/jpeg',.88).split(',')[1]); }; im.src=r.result; }; r.readAsDataURL(file); }); }
 function avHTML(foto, nombre){ if (foto) return `<img src="${foto}" alt="">`; const i=(nombre||'').trim().charAt(0).toUpperCase(); return i ? `<b>${esc(i)}</b>` : `<svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5z"/></svg>`; }
 function avResize(file){ return new Promise((ok,ko)=>{ const r=new FileReader(); r.onerror=ko; r.onload=()=>{ const im=new Image(); im.onerror=ko; im.onload=()=>{ const S=320, s=Math.min(im.width,im.height), cv=document.createElement('canvas'); cv.width=cv.height=S; cv.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,S,S); ok(cv.toDataURL('image/jpeg',.85)); }; im.src=r.result; }; r.readAsDataURL(file); }); }
 function settingsModal(){
@@ -1643,7 +1733,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261126k';
+const BUILD='b20261126m';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
