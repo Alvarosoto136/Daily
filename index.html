@@ -299,7 +299,8 @@ label.bfield input{flex:1}
 .bv small{font-size:12px;font-weight:500;color:var(--muted)}
 .bline+.bres{margin-top:14px!important}
 .bout>.bres:first-child{margin-top:4px!important}
-.acal{margin:2px 0 10px}
+.agas{font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--muted);white-space:nowrap}
+.agas small{font-size:13px;font-weight:500}
 .bhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .bhead h3{margin:0!important}
 .bnum{font-size:26px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
@@ -1188,8 +1189,7 @@ function setSleep(field, val){
 function woCardHTML(k){
   const has = hevyOf(k).length;
   const a = actOf(k), r = balanceCalc(k);
-  return `<div class="wohead"><h3>Actividad física</h3></div>
-    <div class="acal">${calLinesHTML(k)}</div>
+  return `<div class="wohead"><h3>Actividad física</h3><span class="acal">${calLinesHTML(k)}</span></div>
     <label class="wtop wsteps"><div><span class="wtype pasos">👟 Pasos</span><div class="wmeta">Pasos del día</div></div>
       <input type="number" min="0" step="100" data-act="pasos" value="${esc(a.pasos)}" placeholder="0">
       <div class="wkc"><b id="pasosK">${r.ok?fk(r.pasos):'–'}</b><small>kcal</small></div></label>
@@ -1214,7 +1214,7 @@ function balResHTML(k){
 }
 function calLinesHTML(k){
   const r = balanceCalc(k); if (!r.ok) return '';
-  return `<div class="bline"><span class="bi2 out">🔥</span><div class="bl"><b>Calorías gastadas</b></div><div class="bv">${N('bgas',r.gasto)} <small>kcal</small></div></div>`;
+  return `<b class="agas">${N('bgas',r.gasto)} <small>kcal</small></b>`;
 }
 function balanceHTML(k, editable){
   return `<div class="bout">${balResHTML(k)}</div>`;
@@ -1585,7 +1585,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261125u';
+const BUILD='b20261126a';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
