@@ -827,6 +827,7 @@ window.ALIMENTOS = [
   {n:"Yogur griego", e:"🥣", cat:"Proteína", marca:"Hacendado", k:60, p:5.8, c:4.7, g:2.0},
   {n:"Yogur proteinas", e:"🥛", cat:"Proteína", marca:"Hacendado", k:52, p:10, c:3.1, g:0.5},
   {n:"Yogur de fresa", e:"🍓", cat:"Proteína", marca:"Hacendado", u:120, k:53, p:8.3, c:5.0, g:0.5},
+  {n:"Mozzarella", e:"🧀", cat:"Proteína", marca:"Hacendado", k:283, p:21, c:2.5, g:21},
   {n:"Queso fresco batido", e:"🍶", cat:"Proteína", marca:"Hacendado", k:46, p:8.0, c:3.5, g:0.3},
   // Carbohidrato
   {n:"Gnocchi", e:"🥟", cat:"Carbohidrato", marca:"Hacendado", k:174, p:4.5, c:37.6, g:0.4},
@@ -1585,7 +1586,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261126b';
+const BUILD='b20261126c';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
