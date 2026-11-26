@@ -954,7 +954,7 @@ const todayKey = () => keyOf(new Date());
 const nf0 = new Intl.NumberFormat('es-ES',{maximumFractionDigits:0});
 const nf1 = new Intl.NumberFormat('es-ES',{maximumFractionDigits:1});
 const fk = n => nf0.format(Math.round(n||0));
-const fm = n => (n||0) < 10 ? nf1.format(n||0) : nf0.format(Math.round(n||0));
+const fm = n => nf1.format(n||0);   // macros siempre con su decimal, sin redondear a entero
 const FMT = {k:fk, m:fm};
 const N = (key, v, f='k') => `<span data-n="${key}" data-v="${+v||0}" data-f="${f}">${FMT[f](v)}</span>`;
 // Re-renderiza y anima barras, anillo y números desde su valor anterior
@@ -1382,7 +1382,7 @@ Responde SOLO con un JSON así: {"k":kcal,"p":proteinas_g,"c":hidratos_g,"g":gra
       const m = t.match(/\{[\s\S]*\}/); if (!m) throw new Error('sin datos');
       const d = JSON.parse(m[0]), f=$('#fNew'); if (!f) return;
       const set=(n,v)=>{ if (v!=null && v!=='' && f[n]) { f[n].value=v; f[n].classList.add('filled'); setTimeout(()=>f[n].classList.remove('filled'),900); } };
-      ['k','p','c','g'].forEach(n=>set(n, d[n]!=null ? Math.round(+d[n]*10)/10 : null));
+      ['k','p','c','g'].forEach(n=>set(n, d[n]!=null ? +d[n] : null));
       if (d.marca && !f.marca.value) set('marca', d.marca); if (+d.u>0) set('u', +d.u);
       if (d.e) set('e', d.e); if (d.cat && GROUPS.some(g=>g.id===d.cat)) f.cat.value=d.cat;
       const miss=['k','p','c','g'].filter(n=>d[n]==null);
@@ -1423,7 +1423,7 @@ async function bcLookup(code){
       $('#scanLbl').classList.add('pulse'); setTimeout(()=>$('#scanLbl')?.classList.remove('pulse'),2400);
       toast('Producto no encontrado: haz una foto a la tabla'); return; }
     const set=(k,v)=>{ if (v!=null && v!=='' && f[k]){ f[k].value=v; f[k].classList.add('filled'); setTimeout(()=>f[k]?.classList.remove('filled'),900); } };
-    ['k','p','c','g'].forEach(k=>set(k, vals[k]!=null ? Math.round(+vals[k]*10)/10 : null));
+    ['k','p','c','g'].forEach(k=>set(k, vals[k]!=null ? +vals[k] : null));
     const nm=(pr.product_name_es||pr.product_name||'').trim(); if (nm && !f.n.value) set('n', nm);
     const br=(pr.brands||'').split(',')[0].trim(); if (br && !f.marca.value) set('marca', br);
     $('#bcBox').hidden=true; const miss=['k','p','c','g'].filter(k=>vals[k]==null);
@@ -1733,7 +1733,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261126m';
+const BUILD='b20261126n';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
