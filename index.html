@@ -754,6 +754,7 @@ html.dark .swi .se .addbtn,html.dark .swi .se .addbtn:hover{background:#3a3a3c;c
 html.dark .bcman input{background:#2c2c2e;border-color:#38383a;color:var(--text)}
 .field input.filled{border-color:var(--green);box-shadow:0 0 0 3px rgba(52,199,89,.18);transition:box-shadow .3s,border-color .3s}
 .noai{display:none!important}
+.manualc{margin-top:12px}.grow .gn small{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:1px}
 </style>
 </head>
 <body>
@@ -1024,7 +1025,8 @@ function renderPicker(dir){
   } else if (ui.step===2){
     $('#crumbs').innerHTML = `${back}<div class="path"><button data-goto="1">${mealName()}</button></div>${dots}`;
     st.innerHTML = `<div class="glist card">${GROUPS.map(g=>
-      `<button class="grow" data-group="${g.id}" style="--tint:${g.tint}"><span class="gi">${g.icon}</span><span class="gn">${g.id}</span><span class="gc">›</span></button>`).join('')}</div>`;
+      `<button class="grow" data-group="${g.id}" style="--tint:${g.tint}"><span class="gi">${g.icon}</span><span class="gn">${g.id}</span><span class="gc">›</span></button>`).join('')}</div>
+      <div class="glist card manualc"><button class="grow" id="manualAdd" style="--tint:#eef3ff"><span class="gi">✍️</span><span class="gn">Añadir manual<small>Comida fuera: pon tú las kcal y los macros</small></span><span class="gc">›</span></button></div>`;
   } else {
     $('#crumbs').innerHTML = `${back}<div class="path"><button data-goto="1">${mealName()}</button><i>›</i><button data-goto="2">${esc(ui.group)}</button></div>${dots}`;
     st.innerHTML = `<div class="foodbar"><label class="search"><span>🔍</span><input id="q" placeholder="Buscar en ${esc(ui.group)}…" autocomplete="off" value="${esc(ui.q)}"></label></div>
@@ -1099,9 +1101,9 @@ function logHTML(k, editable){
     return `${i?'<hr>':''}<div class="mg ${open?'open':''}" data-mg="${m.id}">
       <button class="mhead" ${items.length?'':'disabled'}><span class="mt">${m.icon} ${m.name}</span>
         <span class="mk">${items.length?fk(t.k)+' kcal':'—'}</span>${items.length?'<span class="chev"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':'<span class="chev nochev"></span>'}</button>
-      <div class="mbody"><div>${items.length ? items.map((e,j)=>{ const v=calc(e.prod,e.grams); return `${editable?`<div class="swi" data-noswipe data-ent="${m.id}:${j}"><div class="swbg"><span class="sd"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg></span><span class="se"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5zM13.5 7l3 3"/></svg><label class="gbox"><input class="qin" type="number" inputmode="decimal" step="any" min="0" value="${e.units!=null&&e.prod.u?e.units:Math.round(e.grams)}"><span>${e.units!=null&&e.prod.u?(e.prod.ul?'cda':'ud'):'g'}</span></label><button class="addbtn qok">Guardar</button></span></div>`:''}<div class="item">
+      <div class="mbody"><div>${items.length ? items.map((e,j)=>{ const v=calc(e.prod,e.grams); return `${editable?`<div class="swi" data-noswipe data-ent="${m.id}:${j}"><div class="swbg"><span class="sd"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg></span><span class="se"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5zM13.5 7l3 3"/></svg><label class="gbox"><input class="qin" type="number" inputmode="decimal" step="any" min="0" value="${e.units!=null&&e.prod.u?e.units:e.prod.rac?e.grams/100:Math.round(e.grams)}"><span>${e.units!=null&&e.prod.u?(e.prod.ul?'cda':'ud'):e.prod.rac?'rac':'g'}</span></label><button class="addbtn qok">Guardar</button></span></div>`:''}<div class="item">
         <div class="ie">${emoHTML(e.prod)}</div>
-        <div class="in"><div>${esc(e.prod.n)}</div><div>${e.units?nf1.format(e.units)+' '+(e.prod.ul||'unidad')+(e.units==1?'':(e.prod.ul?'s':'es')):fk(e.grams)+' g'} · P ${fm(v.p)} · C ${fm(v.c)} · G ${fm(v.g)}</div></div>
+        <div class="in"><div>${esc(e.prod.n)}</div><div>${e.units?nf1.format(e.units)+' '+(e.prod.ul||'unidad')+(e.units==1?'':(e.prod.ul?'s':'es')):e.prod.rac?(e.grams==100?'1 ración':nf1.format(e.grams/100)+' raciones'):fk(e.grams)+' g'} · P ${fm(v.p)} · C ${fm(v.c)} · G ${fm(v.g)}</div></div>
         <div class="ik">${fk(v.k)} kcal</div>
         ${editable?`<button class="x" data-del="${m.id}:${j}" title="Quitar">✕</button>`:''}</div>${editable?'</div>':''}`; }).join('')
       : ''}</div></div></div>`;
@@ -1340,6 +1342,26 @@ function addEntry(){
 function openModal(html){ $('#modalRoot').innerHTML = `<div class="modal-bg"><div class="card modal">${html}</div></div>`;
   const f=$('#modalRoot input'); if (f) f.focus(); }
 function closeModal(){ bcStop(); const bg=$('#modalRoot .modal-bg'); if (!bg || bg.classList.contains('out')){ return; } bg.classList.add('out'); setTimeout(()=>{ if ($('#modalRoot .modal-bg.out')) $('#modalRoot').innerHTML=''; }, 180); }
+function manualModal(){
+  openModal(`<h2>Añadir manual</h2><p class="s">Para lo que comes fuera. Pon los valores de lo que te has comido (la ración entera), no por 100 g. Se suma a ${esc(mealName().toLowerCase())} y no se guarda en tu lista de alimentos.</p>
+    <form id="fMan">
+      <div class="row2"><div class="field"><label>Nombre</label><input name="n" required placeholder="Ej. Pollo empanado"></div>
+      <div class="field"><label>Cantidad en g (opcional)</label><input name="q" type="number" inputmode="decimal" step="any" min="0" placeholder="100"></div></div>
+      <div class="row4">
+        <div class="field"><label>Kcal</label><input name="k" type="number" inputmode="decimal" step="any" min="0" required></div>
+        <div class="field"><label>Proteína</label><input name="p" type="number" inputmode="decimal" step="any" min="0" value="0"></div>
+        <div class="field"><label>Hidratos</label><input name="c" type="number" inputmode="decimal" step="any" min="0" value="0"></div>
+        <div class="field"><label>Grasa</label><input name="g" type="number" inputmode="decimal" step="any" min="0" value="0"></div>
+      </div>
+      <div class="mfoot"><button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Añadir</button></div>
+    </form>`);
+  $('#fMan').onsubmit = ev => { ev.preventDefault(); const f=Object.fromEntries(new FormData(ev.target));
+    const q = +f.q>0 ? +f.q : 0, base = q || 100, sc = 100/base;
+    const prod = {n:f.n.trim(), e:'✍️', k:(+f.k||0)*sc, p:(+f.p||0)*sc, c:(+f.c||0)*sc, g:(+f.g||0)*sc, man:1}; if (!q) prod.rac=1;
+    const day = db.days[ui.date] = dayData(ui.date); day[ui.meal] = day[ui.meal]||[];
+    day[ui.meal].push({prod, grams:base, at:Date.now()}); save(); closeModal();
+    toast(`${prod.n} · ${fk(+f.k||0)} kcal añadido a ${mealName()}`); renderSide(); };
+}
 function newProductModal(){
   const cats = GROUPS.map(g=>g.id);
   openModal(`<h2>Nuevo producto</h2><p class="s">Escanea el código de barras y se rellena solo. Si el producto no aparece, haz una foto a la tabla nutricional.</p>
@@ -1637,6 +1659,7 @@ document.addEventListener('click', e => {
   if (t.closest('#nextDay')) return setDate(addDays(ui.date,1));
   if (t.closest('#todayBtn')) return setDate(todayKey());
   if (t.closest('#newProd')) return newProductModal();
+  if (t.closest('#manualAdd')) return manualModal();
   const mb = t.closest('[data-meal]'); if (mb){ ui.meal=mb.dataset.meal; return go(2,'fwd'); }
   const gb = t.closest('[data-group]'); if (gb){ ui.group=gb.dataset.group; return go(3,'fwd'); }
   const gt = t.closest('[data-goto]'); if (gt){ return go(+gt.dataset.goto,'back'); }
@@ -1712,7 +1735,7 @@ document.addEventListener('touchmove', e=>{ if (e.touches.length>1) e.preventDef
   const close=(s)=>{ if (!s) return; const el=s.querySelector('.item'); el.classList.add('anim'); el.style.transform=''; s.querySelector('.qin')?.blur(); setTimeout(()=>s.classList.remove('on','ed','del','go'),230); if (open===s) open=null; };
   const save1=(s)=>{ const [m,j]=s.dataset.ent.split(':'), e=(dayData(ui.date)[m]||[])[+j], q=+s.querySelector('.qin').value; if (!e) return;
     if (!(q>0)){ toast('Introduce una cantidad'); return; }
-    const byU=e.units!=null && e.prod.u; if (byU){ e.units=q; e.grams=q*e.prod.u; } else e.grams=q;
+    const byU=e.units!=null && e.prod.u; if (byU){ e.units=q; e.grams=q*e.prod.u; } else if (e.prod.rac) e.grams=q*100; else e.grams=q;
     save(); open=null; renderSide(); if (ui.step===1) renderPicker(); toast(`${e.prod.n}: ${byU?nf1.format(q)+' ud':fk(q)+' g'}`); };
   document.addEventListener('touchstart', e=>{ const s=e.target.closest('.swi');
     if (open && s!==open){ close(open); }
@@ -1739,7 +1762,7 @@ setTimeout(()=>{ const sp=$('#splash'); if (sp) sp.remove(); }, 2750);
 if ('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 // Si llega una versión nueva mientras la app está abierta, recarga una vez
 // Si hay versión nueva: recarga al momento si acabas de abrir la app (tapado por la pantalla de carga); si no, la verás la próxima vez
-const BUILD='b20261128a';
+const BUILD='b20261128b';
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller){ fetch('index.html?chk='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{ const m=t.match(/const BUILD='([^']+)'/); if (m && m[1]!==BUILD && !sessionStorage.getItem('dly-rl-'+m[1])){ sessionStorage.setItem('dly-rl-'+m[1],'1'); caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload()); } }).catch(()=>{}); }
 if ('serviceWorker' in navigator){ const had=!!navigator.serviceWorker.controller; let rl=false; navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if (rl || !had) return; rl=true; location.reload(); }); }
 const AI_ICON = `<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M18.5 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".75"/></svg>`;
